@@ -1,0 +1,175 @@
+package v3
+
+import (
+	"cmp"
+	"codegen/tmpl"
+	"encoding/json"
+	"github.com/samber/lo"
+	"io"
+	"net/http"
+)
+
+func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
+
+	//fetch
+	resp, err := http.Get(addr)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	//read
+	body, _ := io.ReadAll(resp.Body)
+	var doc = &Doc{}
+	err = json.Unmarshal(body, doc)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	//load
+	refs := make([]*tmpl.Ref, 0)
+
+	toPropertyType := func(info Property) *tmpl.NamedType {
+		return schemaType(info.Schema).Parse()
+	}
+
+	//properties
+	toProperties := func(info Mode) tmpl.Properties {
+
+		array := make(tmpl.Properties, 0)
+		for name, property := range info.Properties {
+
+			array = append(array, &tmpl.Property{
+				Name:        name,
+				Description: property.Description,
+				Type:        toPropertyType(property),
+				Format:      property.Format,
+				Enums:       []string{},
+			})
+		}
+		return array
+	}
+
+	//refs
+	schemas := doc.Components.Schemas
+	for name, mode := range schemas {
+
+		ref := &tmpl.Ref{
+			Name: name,
+			Type: &tmpl.NamedType{
+				Kind:       tmpl.ReferenceType,
+				Expression: name,
+			},
+			Properties:  toProperties(mode),
+			Description: mode.Description,
+		}
+
+		refs = append(refs, ref)
+	}
+
+	toParameters := func(method string, info Method) tmpl.Parameters {
+		parameters := make([]*tmpl.Parameter, 0)
+		for _, item := range info.Parameters {
+
+			tp := schemaType(item.Schema).Parse()
+
+			// 只支持基础数据类型 FoundationType ArrayType
+			parameters = append(parameters, &tmpl.Parameter{
+				Name:        item.Name,
+				Required:    item.Required,
+				Type:        tp,
+				In:          item.In,
+				Format:      item.Schema.Format,
+				Description: item.Description,
+			})
+		}
+		return parameters
+	}
+
+	toRequest := func(method string, info Method) (nt *tmpl.NamedType) {
+		//包装类型
+		schema := info.RequestBody.Content["application/json"].Schema
+		return schemaType(schema).Parse()
+	}
+
+	toResponse := func(method string, info Method) *tmpl.NamedType {
+
+		var refPath string
+		response := info.Responses["200"]
+		if response.Ref != "" {
+			refPath = response.Ref
+		} else {
+			refPath = response.Content["*/*"].Schema.Ref
+		}
+
+		return &tmpl.NamedType{
+			Kind:       tmpl.ReferenceType,
+			Expression: RefPath(refPath).BaseName(),
+		}
+	}
+
+	//paths
+	paths := make([]*tmpl.Path, 0)
+	for path, item := range doc.Paths {
+		for method, fn := range item {
+
+			p := &tmpl.Path{
+				Tag:         lo.Ternary(len(fn.Tags) > 0, fn.Tags[0], "UnnamedApi"),
+				Name:        fn.OperationId,
+				Description: fn.Summary,
+				Path:        path,
+				Method:      method,
+				Parameters:  toParameters(method, fn),
+				Request:     toRequest(method, fn),
+				Response:    toResponse(method, fn),
+			}
+			paths = append(paths, p)
+		}
+	}
+
+	//分组
+	groups := lo.GroupBy(paths, func(item *tmpl.Path) string {
+		return item.Tag
+	})
+
+	//apis
+	apis := make([]*tmpl.Api, 0)
+	for _, tag := range doc.Tags {
+		apis = append(apis, &tmpl.Api{
+			Name:        tag.Name,
+			Description: tag.Description,
+			Paths:       groups[tag.Name],
+		})
+	}
+
+	return refs, apis, nil
+}
+
+type schemaType Schema
+
+func (s schemaType) Parse() *tmpl.NamedType {
+
+	var expression string
+	var kind tmpl.NamedTypeKind
+
+	if s.Ref != "" {
+		kind = tmpl.ReferenceType
+		expression = s.Ref
+	} else {
+		if s.Type == "array" {
+			expression = cmp.Or(s.Items.Type, s.Items.Ref)
+			kind = lo.Ternary(expression == s.Items.Type, tmpl.ArrayType|tmpl.FoundationType, tmpl.ArrayType|tmpl.ReferenceType)
+		} else {
+			expression = cmp.Or(s.Type, s.Ref)
+			kind = lo.Ternary(expression == s.Type, tmpl.FoundationType, tmpl.ReferenceType)
+		}
+	}
+
+	if expression == "" {
+		return nil
+	}
+
+	return &tmpl.NamedType{Kind: kind, Expression: RefPath(expression).BaseName()}
+}

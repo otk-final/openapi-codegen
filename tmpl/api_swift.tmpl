@@ -1,0 +1,89 @@
+{{define "header"}}
+import Foundation
+
+/**
+ * TODO You need to implement the current protocol, which can refer to Alamofire or URLSession
+ */
+protocol ApiClient {
+
+    func get<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+    func post<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+    func put<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+    func delete<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+    func options<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+    func header<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+    func patch<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+    func trace<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+
+}
+
+{{end}}
+
+
+{{define "struct"}}
+/**
+ * {{.Description}}
+ */
+public struct {{.Type.Expression}}: Codable {
+	{{range $val :=.Properties -}}
+	//{{$val.Description}}
+	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
+	var {{$val.Name}}: {{$val.Type.Expression}}
+	{{end}}
+}
+{{end}}
+
+{{define "parameters"}}
+	{{- if .Parameters -}}
+		params : {{CapitalizeLetter .Name}}Params
+	{{- else -}}
+		params : {{if .Request}}{{.Request.Expression}}{{else}}Codable? = nil{{end}}
+	{{- end -}}
+{{end}}
+
+
+{{define "path"}}
+    {{if .Parameters}}
+    /**
+    * {{.Description}} method Params
+    */
+    struct {{CapitalizeLetter .Name}}Params: Codable {
+        {{range $idx,$val := .Parameters -}}
+        var {{$val.Name}}: {{$val.Type.Expression}}{{if $val.Required}}{{else}}?{{end}}
+        {{end}}
+    }
+    {{end}}
+
+	/**
+	 * {{.Description}}
+	 */
+    func {{.Name}}({{template "parameters" .}}) async throws -> {{.Response.Expression}} {
+        return try await client.{{.Method}}({{.Path}}, params ,{{.Response.Expression}}.self)
+    }
+{{end}}
+
+
+{{define "api"}}
+/**
+ * {{.Description}}
+ */
+class {{.Name}} {
+
+    var client: ApiClient
+
+    init(client: ApiClient) {
+        self.client = client
+    }
+
+	{{range $val :=.Paths -}}
+	{{template "path" $val}}
+	{{end}}
+}
+{{end}}

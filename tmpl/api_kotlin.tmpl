@@ -1,0 +1,84 @@
+{{define "header"}}
+package com.otk.sts.api
+
+import java.io.Serializable
+
+/**
+ * TODO You need to implement the current interface, which can refer to Retorfit or OkHttp
+ */
+interface ApiClient {
+
+    suspend fun <P : Any, V : Any> get(path: String, params: P?): V
+
+    suspend fun <P : Any, V : Any> post(path: String, params: P?): V
+
+    suspend fun <P : Any, V : Any> put(path: String, params: P?): V
+
+    suspend fun <P : Any, V : Any> delete(path: String, params: P?): V
+
+    suspend fun <P : Any, V : Any> options(path: String, params: P?): V
+
+    suspend fun <P : Any, V : Any> trace(path: String, params: P?): V
+
+    suspend fun <P : Any, V : Any> header(path: String, params: P?): V
+
+    suspend fun <P : Any, V : Any> patch(path: String, params: P?): V
+}
+
+{{end}}
+
+
+{{define "struct"}}
+/**
+ * {{.Description}}
+ */
+data class {{.Type.Expression}} (
+	{{range $val :=.Properties -}}
+	//{{$val.Description}}
+	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
+	var {{$val.Name}}: {{$val.Type.Expression}},
+	{{end}}
+) : Serializable
+{{end}}
+
+
+{{define "parameters"}}
+	{{- if .Parameters -}}
+		params : {{CapitalizeLetter .Name}}Params
+	{{- else -}}
+		params : {{if .Request}}{{.Request.Expression}}{{else}}Any? = null{{end}}
+	{{- end -}}
+{{end}}
+
+
+{{define "path"}}
+    {{if .Parameters}}
+    /**
+    * {{.Description}} method Params
+    */
+    data class {{CapitalizeLetter .Name}}Params(
+        {{range $idx,$val := .Parameters -}}
+        var {{$val.Name}}: {{$val.Type.Expression}}{{if $val.Required}}{{else}}?{{end}},
+        {{end}}
+    ): Serializable
+    {{end}}
+
+	/**
+	 * {{.Description}}
+	 */
+    suspend fun {{.Name}}({{template "parameters" .}}):  {{.Response.Expression}} {
+        return client.{{.Method}}({{.Path}}, params)
+    }
+{{end}}
+
+
+{{define "api"}}
+/**
+ * {{.Description}}
+ */
+class {{.Name}}(private var client: ApiClient) {
+	{{range $val :=.Paths -}}
+	{{template "path" $val}}
+	{{end}}
+}
+{{end}}

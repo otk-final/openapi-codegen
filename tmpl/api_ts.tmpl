@@ -1,0 +1,72 @@
+{{define "header"}}
+import { ApiClient } from "./client"
+{{end}}
+
+{{define "adapter"}}
+
+export const ApiClient = {
+
+    get: async (path: string, params?: any) => {
+        return {} as any
+    },
+
+    post: async (path: string, params?: any) => {
+        return {} as any
+    },
+
+    put: async (path: string, params?: any) => {
+        return {} as any
+    },
+
+    delete: async (path: string, params?: any) => {
+        return {} as any
+    },
+}
+
+{{end}}
+
+
+
+{{define "struct"}}
+/**
+ * {{.Description}}
+ */
+export interface {{.Type.Expression}} {
+	{{range $val :=.Properties -}}
+	//{{$val.Description}}
+	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
+	{{$val.Name}}: {{$val.Type.Expression}}
+	{{end}}
+}
+{{end}}
+
+
+{{define "api"}}
+/**
+ * {{.Description}}
+ */
+export const {{.Name}} = {
+	{{range $val :=.Paths -}}
+	{{template "path" $val}}
+	{{end}}
+}
+{{end}}
+
+
+{{define "parameters"}}
+	{{- if .Parameters -}}
+		params:{ {{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}} {{$val.Name}} {{if $val.Required}}:{{else}}?:{{end}} {{$val.Type.Expression}}{{end}} }
+	{{- else -}}
+		{{if .Request}} params:{{.Request.Expression}} {{else}} params?:any {{end}}
+	{{- end -}}
+{{end}}
+
+
+{{define "path"}}
+	/**
+	 * {{.Description}}
+	 */
+	{{.Name}}: async ({{template "parameters" .}}) => {
+		return await ApiClient.{{.Method}}({{.Path}},params) as {{.Response.Expression}}
+	},
+{{end}}

@@ -1,0 +1,105 @@
+{{define "structHeader"}}
+package {{Variable .Variables "structPackage"}};
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
+{{end}}
+
+{{define "struct"}}
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class {{.Type.Expression}} implements Serializable {
+    {{range $val :=.Properties -}}
+    private {{$val.Type.Expression}} {{$val.Name}};
+    {{end}}
+}
+{{end}}
+
+
+{{define "apiHeader"}}
+package {{Variable .Variables "apiPackage"}};
+
+import {{Variable .Variables "structPackage"}}.*;
+import {{Variable .Variables "clientPackage"}}.ApiClient;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+{{end}}
+
+{{define "api"}}
+/**
+ * {{.Description}}
+ */
+public class {{CapitalizeLetter .Name}} {
+
+    private final ApiClient client;
+
+    public {{CapitalizeLetter .Name}}(ApiClient client) {
+        this.client = client;
+    }
+
+	{{range $val :=.Paths -}}
+	{{template "path" $val}}
+	{{end}}
+}
+{{end}}
+
+
+
+{{define "path"}}
+
+    public static final TypeReference<{{.Response.Expression}}> {{.Name}}ResultType = new TypeReference<{{.Response.Expression}}>() {
+    };
+
+	/**
+	 * {{.Description}}
+	 */
+    public {{.Response.Expression}} {{.Name}}({{template "parameters" .}}) {
+        {{if .Parameters -}}
+        Map<String,Object> params = new HashMap<String,Object>();
+        {{range $idx,$val := .Parameters -}}
+        params.put("{{$val.Name}}",{{$val.Name}});
+        {{end}}
+        {{- end -}}
+        return client.{{.Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}null{{end}}, {{.Name}}ResultType);
+    }
+{{end}}
+
+
+{{define "parameters"}}
+	{{- if .Parameters -}}
+		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Type.Expression}} {{$val.Name}}{{end}}
+	{{- else -}}
+		{{if .Request}} {{.Request.Expression}} params {{end}}
+	{{- end -}}
+{{end}}
+
+
+
+{{define "client"}}
+
+package {{Variable .Variables "clientPackage"}};
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.util.Map;
+
+public interface ApiClient  {
+
+    <T> T get(String path, Map<String, Object> params, TypeReference<T> resultType);
+
+    <P, T> T put(String path, P body, TypeReference<T> resultType);
+
+    <P, T> T post(String path, P params, TypeReference<T> resultType);
+
+    <P, T> T delete(String path, P params, TypeReference<T> resultType);
+}
+{{end}}

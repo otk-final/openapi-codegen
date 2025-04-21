@@ -1,0 +1,84 @@
+{{define "header"}}
+from dataclasses import dataclass
+from typing import Generic, TypeVar, Optional, Any, Type
+
+T = TypeVar('T')
+A = TypeVar('A')
+B = TypeVar('B')
+C = TypeVar('C')
+P = TypeVar('P')
+
+
+class ApiClient:
+
+    def get(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def post(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def put(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def delete(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def options(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def header(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def trace(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+{{end}}
+
+{{define "struct"}}
+@dataclass
+class {{.Type.Expression}}:
+    """
+    {{.Name}} {{.Description}}
+    """
+	{{range $val :=.Properties -}}
+	{{$val.Name}}: {{$val.Type.Expression}}
+	{{end}}
+{{end}}
+
+
+
+{{define "api"}}
+class {{.Name}}:
+    """
+    {{.Description}}
+    """
+    client: ApiClient = None
+
+    def __init__(self, client: ApiClient):
+        self.client = client
+
+    {{range $val :=.Paths -}}
+    {{template "path" $val}}
+    {{end}}
+
+{{end}}
+
+
+{{define "path"}}
+    {{if .Parameters}}
+    class {{CapitalizeLetter .Name}}Params:
+        """
+        {{.Description}} Params
+        """
+        {{range $idx,$val := .Parameters -}}
+        {{$val.Name}}: {{$val.Type.Expression}} = None
+        {{end}}
+    {{end}}
+
+
+    def {{.Name}}(self, params: {{if .Parameters}}{{CapitalizeLetter .Name}}Params = None{{else}}Any = None{{end}}) -> Optional[{{.Response.Expression}}]:
+        """
+        {{.Description}}
+        """
+        return self.client.{{.Method}}({{.Path}}, params ,{{.Response.Expression}}.self)
+{{end}}

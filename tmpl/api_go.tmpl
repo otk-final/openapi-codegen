@@ -1,0 +1,60 @@
+{{define "header"}}
+package demo
+
+// ApiClient TODO You need to implement the current interface, which can refer to std http
+type ApiClient[P any, T any] interface {
+
+	Get(name string, params P) (T, error)
+
+	Post(name string, params P) (T, error)
+
+	Put(name string, params P) (T, error)
+
+	Delete(name string, params P) (T, error)
+
+	Options(name string, params P) (T, error)
+
+	Header(name string, params P) (T, error)
+
+	Patch(name string, params P) (T, error)
+
+	Trace(name string, params P) (T, error)
+}
+
+{{end}}
+
+{{define "struct"}}
+// {{.Name}} {{if .Description}}{{.Description}}{{else}}{{.Type.Expression}}{{end}}
+type {{.Type.Expression}} struct {
+	{{range $val :=.Properties -}}
+	{{CapitalizeLetter $val.Name}}  {{$val.Type.Expression}}  `json:"{{$val.Name}},omitempty"` //{{$val.Description}}
+	{{end}}
+}
+{{end}}
+
+
+{{define "path"}}
+
+// {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} {{.Path}}
+type {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} struct {
+    Client ApiClient[*{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params, *{{.Response.Expression}}]
+}
+
+// {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params {{.Path}}
+type {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params struct {
+      {{range $idx,$val := .Parameters -}}
+      {{CapitalizeLetter $val.Name}}  {{$val.Type.Expression}}    `json:"{{$val.Name}},omitempty"`
+      {{end}}
+}
+
+// Call {{.Description}}
+func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call(params *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params) (*{{.Response.Expression}}, error) {
+    return receiver.Client.{{CapitalizeLetter .Method}}({{.Path}}, params)
+}
+{{end}}
+
+{{define "api"}}
+    	{{range $val :=.Paths -}}
+    	{{template "path" $val}}
+    	{{end}}
+{{end}}
