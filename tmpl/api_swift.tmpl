@@ -1,6 +1,11 @@
 {{define "header"}}
 import Foundation
 
+{{end}}
+
+{{define "client"}}
+import Foundation
+
 /**
  * TODO You need to implement the current protocol, which can refer to Alamofire or URLSession
  */
@@ -14,16 +19,7 @@ protocol ApiClient {
 
     func delete<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
 
-    func options<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
-
-    func header<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
-
-    func patch<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
-
-    func trace<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
-
 }
-
 {{end}}
 
 
@@ -40,11 +36,12 @@ public struct {{.Type.Expression}}: Codable {
 }
 {{end}}
 
+
 {{define "parameters"}}
 	{{- if .Parameters -}}
-		params : {{CapitalizeLetter .Name}}Params
+		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}_ {{$val.Alias}}:{{$val.Type.Expression}}{{end}}
 	{{- else -}}
-		params : {{if .Request}}{{.Request.Expression}}{{else}}Codable? = nil{{end}}
+		{{if .Request}}_ params {{.Request.Expression}} {{end}}
 	{{- end -}}
 {{end}}
 

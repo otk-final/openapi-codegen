@@ -16,13 +16,6 @@ interface ApiClient {
 
     suspend fun <P : Any, V : Any> delete(path: String, params: P?): V
 
-    suspend fun <P : Any, V : Any> options(path: String, params: P?): V
-
-    suspend fun <P : Any, V : Any> trace(path: String, params: P?): V
-
-    suspend fun <P : Any, V : Any> header(path: String, params: P?): V
-
-    suspend fun <P : Any, V : Any> patch(path: String, params: P?): V
 }
 
 {{end}}

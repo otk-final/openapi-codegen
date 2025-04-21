@@ -23,15 +23,6 @@ class ApiClient:
     def delete(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
         ...
 
-    def options(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
-        ...
-
-    def header(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
-        ...
-
-    def trace(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
-        ...
-
 {{end}}
 
 {{define "struct"}}
