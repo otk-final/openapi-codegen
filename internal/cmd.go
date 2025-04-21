@@ -20,7 +20,6 @@ type Args struct {
 	Lang         string   `json:"lang"`
 	Style        string   `json:"style"`
 	Filter       []string `json:"filter"`
-	Adapter      string   `json:"client"`
 	Version      string   `json:"version"`
 }
 
@@ -28,6 +27,7 @@ type Env struct {
 	*Args
 	Ignores   []string          `json:"ignores"`
 	Rename    map[string]string `json:"rename"`
+	Alias     map[string]string `json:"alias"`
 	Variables map[string]string `json:"variables"`
 	Generics  *EnvGenerics      `json:"generics"`
 }
@@ -155,7 +155,10 @@ func (e *Executor) Run(cmd *Args, args []string) error {
 
 		//属性转换
 		for _, property := range properties {
+
 			property.Type.GenerateExpression(property.Format, typeConvert)
+
+			property.Alias = cmp.Or(e.env.Alias[property.Name], property.Name)
 		}
 
 		//是否确定导出
@@ -166,6 +169,9 @@ func (e *Executor) Run(cmd *Args, args []string) error {
 		if len(ref.Properties) == 0 {
 			ref.Ignore = true
 		}
+
+		//别名
+		ref.Alias = cmp.Or(e.env.Alias[ref.Name], ref.Name)
 	}
 
 	//查询
@@ -198,6 +204,9 @@ func (e *Executor) Run(cmd *Args, args []string) error {
 			//参数转换
 			for _, parameter := range path.Parameters {
 				parameter.Type.GenerateExpression(parameter.Format, typeConvert)
+
+				//别名
+				parameter.Alias = cmp.Or(e.env.Alias[parameter.Name], parameter.Name)
 			}
 
 			//排序
@@ -251,9 +260,9 @@ func joinPathVariable(language string, path *tmpl.Path) string {
 			key := reg.FindStringSubmatch(seg)[1]
 			switch language {
 			case "swift":
-				return fmt.Sprintf(`\(params.%s)`, key)
+				return fmt.Sprintf(`\(%s)`, key)
 			case "go", "golang":
-				return `" + fmt.Sprintf("%v",` + "params." + tmpl.CapitalizeFirst(key) + `) +"`
+				return `" + fmt.Sprintf("%v",` + key + `) +"`
 			case "java":
 				return fmt.Sprintf(`" + %s +"`, key)
 			default:

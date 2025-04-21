@@ -9,17 +9,20 @@ var testArgs = &Args{
 	Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
 	//Endpoint: "http://localhost:19090/v3/api-docs/admin",
 
-	Output:       "/Users/hxy/develops/xhm/XHM-Admin/src/api/demo.tsx",
-	ClientOutput: "/Users/hxy/develops/xhm/XHM-Admin/src/api/client.tsx",
+	//Output:       "/Users/hxy/develops/xhm/XHM-Admin/src/gc/demo.tsx",
+	//ClientOutput: "/Users/hxy/develops/xhm/XHM-Admin/src/gc/client.tsx",
+
 	//Output:  "/Users/hxy/develops/demo/Codegen/Codegen/Demo.swift",
 	//Output:  "/Users/hxy/develops/demo/sts/app/src/main/java/com/otk/sts/internal/Api.kt",
-	//Output:  "/Users/hxy/develops/gcman/demo/internal.go",
+
+	Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
+	ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/demo/client.go",
+
 	//Output:  "/Users/hxy/develops/demo/internal/demo.py",
 	//Output:  "/Users/hxy/develops/openapi/openapi-server/v3/src/main/java/com/demo",
-	Lang:    "ts",
-	Style:   "",
-	Filter:  []string{},
-	Adapter: "",
+	Lang:   "go",
+	Style:  "",
+	Filter: []string{},
 }
 
 func TestCmd(t *testing.T) {
@@ -32,6 +35,9 @@ func TestCmd(t *testing.T) {
 			"JsonNode": "any",
 			//"object": "JsonNode",
 		},
+		Alias: map[string]string{
+			"type": "type2",
+		},
 		Generics: &EnvGenerics{
 			Enable: true,
 			Expressions: map[string][]string{
@@ -41,9 +47,9 @@ func TestCmd(t *testing.T) {
 			},
 		},
 		Variables: map[string]string{
-			"clientPackage": "com.demo",
+			"clientPackage": "demo",
 			"structPackage": "com.demo.dto",
-			"apiPackage":    "com.demo.api",
+			"apiPackage":    "demo",
 		},
 	}
 	exe, err := New(env, env.Args, []string{})

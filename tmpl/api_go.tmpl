@@ -1,26 +1,5 @@
 {{define "header"}}
-package demo
-
-// ApiClient TODO You need to implement the current interface, which can refer to std http
-type ApiClient[P any, T any] interface {
-
-	Get(name string, params P) (T, error)
-
-	Post(name string, params P) (T, error)
-
-	Put(name string, params P) (T, error)
-
-	Delete(name string, params P) (T, error)
-
-	Options(name string, params P) (T, error)
-
-	Header(name string, params P) (T, error)
-
-	Patch(name string, params P) (T, error)
-
-	Trace(name string, params P) (T, error)
-}
-
+package {{Variable .Variables "apiPackage"}};
 {{end}}
 
 {{define "struct"}}
@@ -37,24 +16,47 @@ type {{.Type.Expression}} struct {
 
 // {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} {{.Path}}
 type {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} struct {
-    Client ApiClient[*{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params, *{{.Response.Expression}}]
-}
-
-// {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params {{.Path}}
-type {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params struct {
-      {{range $idx,$val := .Parameters -}}
-      {{CapitalizeLetter $val.Name}}  {{$val.Type.Expression}}    `json:"{{$val.Name}},omitempty"`
-      {{end}}
+    Client ApiClient[*{{.Response.Expression}}]
 }
 
 // Call {{.Description}}
-func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call(params *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}Params) (*{{.Response.Expression}}, error) {
-    return receiver.Client.{{CapitalizeLetter .Method}}({{.Path}}, params)
+func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call({{template "parameters" .}}) (*{{.Response.Expression}}, error) {
+    {{if .Parameters -}}
+    params := map[string]any{}
+    {{range $idx,$val := .Parameters -}}
+    params["{{$val.Name}}"] = {{$val.Alias}}
+    {{end}}
+    {{- end -}}
+    return receiver.Client.{{CapitalizeLetter .Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}nil{{end}})
 }
+{{end}}
+
+{{define "parameters"}}
+	{{- if .Parameters -}}
+		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}} {{$val.Type.Expression}}{{end}}
+	{{- else -}}
+		{{if .Request}} params {{.Request.Expression}} {{end}}
+	{{- end -}}
 {{end}}
 
 {{define "api"}}
     	{{range $val :=.Paths -}}
     	{{template "path" $val}}
     	{{end}}
+{{end}}
+
+
+{{define "client"}}
+package {{Variable .Variables "clientPackage"}}
+
+// ApiClient TODO You need to implement the current interface, which can refer to std http
+type ApiClient[T any] interface {
+	Get(name string, params map[string]any) (T, error)
+
+	Post(name string, params any) (T, error)
+
+	Put(name string, params any) (T, error)
+
+	Delete(name string, params any) (T, error)
+}
 {{end}}

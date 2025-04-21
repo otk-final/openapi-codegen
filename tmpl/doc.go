@@ -24,6 +24,7 @@ type Path struct {
 
 type Parameter struct {
 	Name        string
+	Alias       string
 	Required    bool
 	In          string
 	Type        *NamedType
@@ -80,6 +81,7 @@ func (nk NamedTypeKind) Parse(expression string, format string, convert lang.Typ
 
 type Ref struct {
 	Name        string
+	Alias       string
 	Type        *NamedType
 	Properties  Properties
 	Description string
@@ -112,6 +114,7 @@ type Generic struct {
 
 type Property struct {
 	Name        string
+	Alias       string
 	Description string
 	Type        *NamedType
 	Format      string

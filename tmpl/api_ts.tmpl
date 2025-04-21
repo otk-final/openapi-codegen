@@ -2,27 +2,37 @@
 import { ApiClient } from "./client"
 {{end}}
 
-{{define "adapter"}}
+{{define "client"}}
+import axios from "axios";
+
+export const baseClient = axios.create({
+    baseURL: "{{.Endpoint}}",
+    headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+    },
+    timeout: Number(60000),
+    withCredentials: false
+})
+
 
 export const ApiClient = {
 
     get: async (path: string, params?: any) => {
-        return {} as any
+        return baseClient.get(path,{params:params}) as any
     },
 
     post: async (path: string, params?: any) => {
-        return {} as any
+        return baseClient.post(path, params) as any
     },
 
     put: async (path: string, params?: any) => {
-        return {} as any
+        return baseClient.put(path, params) as any
     },
 
     delete: async (path: string, params?: any) => {
-        return {} as any
+        return baseClient.delete(path, params) as any
     },
 }
-
 {{end}}
 
 

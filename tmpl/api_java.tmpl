@@ -66,7 +66,7 @@ public class {{CapitalizeLetter .Name}} {
         {{if .Parameters -}}
         Map<String,Object> params = new HashMap<String,Object>();
         {{range $idx,$val := .Parameters -}}
-        params.put("{{$val.Name}}",{{$val.Name}});
+        params.put("{{$val.Name}}",{{$val.Alias}});
         {{end}}
         {{- end -}}
         return client.{{.Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}null{{end}}, {{.Name}}ResultType);
@@ -76,7 +76,7 @@ public class {{CapitalizeLetter .Name}} {
 
 {{define "parameters"}}
 	{{- if .Parameters -}}
-		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Type.Expression}} {{$val.Name}}{{end}}
+		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Type.Expression}} {{$val.Alias}}{{end}}
 	{{- else -}}
 		{{if .Request}} {{.Request.Expression}} params {{end}}
 	{{- end -}}
