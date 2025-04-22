@@ -58,12 +58,14 @@ var initCmd = &cobra.Command{
 			Filter:        []string{},
 			TypeAlias:     map[string]string{},
 			PropertyAlias: map[string]string{},
-			Variables:     map[string]string{},
+			Variables: map[string]string{
+				"apiPackage":    "",
+				"clientPackage": "",
+				"structPackage": "",
+			},
 			Generics: &internal.Generics{
-				Enable: false,
-				Expressions: map[string][]string{
-					"ApiResult": {"data"},
-				},
+				Enable:      false,
+				Expressions: map[string][]string{},
 			},
 		}
 		//当前执行目录

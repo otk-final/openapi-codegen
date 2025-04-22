@@ -48,7 +48,7 @@ type Executor struct {
 func New(env *Env, args []string) (*Executor, error) {
 
 	//初始化模版
-	tp, err := tmpl.NewEngine(env.Lang)
+	tp, err := tmpl.NewEngine(env.Lang, env.Style)
 	if err != nil {
 		return nil, err
 	}

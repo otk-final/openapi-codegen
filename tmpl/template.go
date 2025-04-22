@@ -42,11 +42,16 @@ var tmplFunc = template.FuncMap{
 }
 
 // NewEngine 模版
-func NewEngine(lang string) (*template.Template, error) {
+func NewEngine(lang string, style string) (*template.Template, error) {
 	tp := template.New(lang)
 
 	//扩展方法
 	tp = tp.Funcs(tmplFunc)
+
+	//自定义模版
+	if style != "" {
+		return tp.ParseFiles(style)
+	}
 
 	switch lang {
 	case "ts", "js":
