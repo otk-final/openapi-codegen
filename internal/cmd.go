@@ -36,13 +36,14 @@ type Env struct {
 
 type Generics struct {
 	Enable      bool                `json:"enable"`
+	Unfold      bool                `json:"unfold"`
 	Expressions map[string][]string `json:"expressions"`
 }
 
 type Executor struct {
 	env     *Env
 	convert lang.TypeConvert
-	tp      *template.Template
+	engine  *template.Template
 }
 
 func New(env *Env, args []string) (*Executor, error) {
@@ -54,8 +55,8 @@ func New(env *Env, args []string) (*Executor, error) {
 	}
 
 	return &Executor{
-		env: env,
-		tp:  tp,
+		env:    env,
+		engine: tp,
 	}, nil
 }
 
@@ -153,6 +154,11 @@ func (e *Executor) Run(cmd *Args) error {
 					Subs:       make([]*nestingGeneric, 0),
 				}
 				mgr.recursion(val, matched, ref)
+
+				//是否展开泛型，只获取子类型，方便业务直接使用
+				if e.env.Generics.Unfold {
+					val.unfold()
+				}
 
 				//设置泛型>不可变类型
 				ref.Type.Kind = tmpl.GenericType | tmpl.ImmutableType
@@ -254,10 +260,10 @@ func (e *Executor) Run(cmd *Args) error {
 	w := newWriter(e.env, outRefs, outApis)
 
 	//写入接口
-	err = w.api(e.env.Output, "header", e.tp)
+	err = w.api(e.env.Output, "header", e.engine)
 
 	//写入接口适配
-	err = w.client(e.env.ClientOutput, "client", e.tp)
+	err = w.client(e.env.ClientOutput, "client", e.engine)
 
 	return err
 }

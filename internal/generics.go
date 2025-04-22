@@ -28,7 +28,20 @@ func (n *nestingGeneric) discriminator(convert lang.TypeConvert) string {
 		}
 		lines = append(lines, expression)
 	}
+
+	if len(lines) == 0 {
+		return n.Kind.Parse(n.Expression, n.Format, convert)
+	}
+
 	return convert.Generic(n.Expression, lang.ActualGenericMode, lines...)
+}
+
+func (n *nestingGeneric) unfold() {
+	//多类型忽略
+	if len(n.Subs) > 1 {
+		return
+	}
+	*n = *n.Subs[0]
 }
 
 type nestingGenericManage struct {

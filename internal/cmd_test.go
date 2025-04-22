@@ -6,9 +6,9 @@ import (
 )
 
 var testArgs = &Args{
-	Version: "v2",
-	//Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
-	Endpoint: "http://localhost:8082/v2/api-docs",
+	Version:  "v3",
+	Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
+	//Endpoint: "http://localhost:8082/v2/api-docs",
 
 	Output:       "/Users/hxy/develops/xhm/XHM-Admin/src/gc/demo.tsx",
 	ClientOutput: "/Users/hxy/develops/xhm/XHM-Admin/src/gc/client.tsx",
@@ -43,6 +43,7 @@ func TestCmd(t *testing.T) {
 		},
 		Generics: &Generics{
 			Enable: true,
+			Unfold: true,
 			Expressions: map[string][]string{
 				"ApiResult":    {"data"},
 				"PageData":     {"entities+"},
