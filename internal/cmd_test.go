@@ -6,39 +6,42 @@ import (
 )
 
 var testArgs = &Args{
-	Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
-	//Endpoint: "http://localhost:19090/v3/api-docs/admin",
+	Version: "v2",
+	//Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
+	Endpoint: "http://localhost:8082/v2/api-docs",
 
-	//Output:       "/Users/hxy/develops/xhm/XHM-Admin/src/gc/demo.tsx",
-	//ClientOutput: "/Users/hxy/develops/xhm/XHM-Admin/src/gc/client.tsx",
+	Output:       "/Users/hxy/develops/xhm/XHM-Admin/src/gc/demo.tsx",
+	ClientOutput: "/Users/hxy/develops/xhm/XHM-Admin/src/gc/client.tsx",
 
 	//Output:  "/Users/hxy/develops/demo/Codegen/Codegen/Demo.swift",
 	//Output:  "/Users/hxy/develops/demo/sts/app/src/main/java/com/otk/sts/internal/Api.kt",
 
-	Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
-	ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/demo/client.go",
+	//Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
+	//ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/demo/client.go",
 
 	//Output:  "/Users/hxy/develops/demo/internal/demo.py",
 	//Output:  "/Users/hxy/develops/openapi/openapi-server/v3/src/main/java/com/demo",
-	Lang:   "go",
-	Style:  "",
-	Filter: []string{},
+	Lang: "ts",
 }
 
 func TestCmd(t *testing.T) {
 
 	env := &Env{
 		Args: testArgs,
-		Rename: map[string]string{
+		Ignore: []string{
+			"/error",
+		},
+		Filter: []string{},
+		TypeAlias: map[string]string{
 			//"JsonNode": "[String:String]",
 			//"object":   "[String:String]",
 			"JsonNode": "any",
 			//"object": "JsonNode",
 		},
-		Alias: map[string]string{
-			"type": "type2",
+		PropertyAlias: map[string]string{
+			//"type": "type2",
 		},
-		Generics: &EnvGenerics{
+		Generics: &Generics{
 			Enable: true,
 			Expressions: map[string][]string{
 				"ApiResult":    {"data"},
@@ -52,11 +55,11 @@ func TestCmd(t *testing.T) {
 			"apiPackage":    "demo",
 		},
 	}
-	exe, err := New(env, env.Args, []string{})
+	exe, err := New(env, []string{})
 	if err != nil {
 		t.Error(err)
 	}
-	err = exe.Run(env.Args, []string{})
+	err = exe.Run(env.Args)
 
 	if err != nil {
 		t.Error(err)

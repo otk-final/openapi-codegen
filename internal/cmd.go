@@ -4,7 +4,9 @@ import (
 	"cmp"
 	"codegen/lang"
 	"codegen/tmpl"
-	"codegen/v3"
+	v2 "codegen/v2"
+	v3 "codegen/v3"
+	"errors"
 	"fmt"
 	"github.com/samber/lo"
 	"regexp"
@@ -14,25 +16,25 @@ import (
 )
 
 type Args struct {
-	Endpoint     string   `json:"endpoint"`
-	Output       string   `json:"output"`
-	ClientOutput string   `json:"client_output"`
-	Lang         string   `json:"lang"`
-	Style        string   `json:"style"`
-	Filter       []string `json:"filter"`
-	Version      string   `json:"version"`
+	Endpoint     string `json:"endpoint"`
+	Output       string `json:"output"`
+	ClientOutput string `json:"client_output"`
+	Lang         string `json:"lang"`
+	Style        string `json:"style"`
+	Version      string `json:"version"`
 }
 
 type Env struct {
 	*Args
-	Ignores   []string          `json:"ignores"`
-	Rename    map[string]string `json:"rename"`
-	Alias     map[string]string `json:"alias"`
-	Variables map[string]string `json:"variables"`
-	Generics  *EnvGenerics      `json:"generics"`
+	Ignore        []string          `json:"ignore"`
+	Filter        []string          `json:"filter"`
+	TypeAlias     map[string]string `json:"typeAlias"`
+	PropertyAlias map[string]string `json:"propertyAlias"`
+	Variables     map[string]string `json:"variables"`
+	Generics      *Generics         `json:"generics"`
 }
 
-type EnvGenerics struct {
+type Generics struct {
 	Enable      bool                `json:"enable"`
 	Expressions map[string][]string `json:"expressions"`
 }
@@ -43,10 +45,10 @@ type Executor struct {
 	tp      *template.Template
 }
 
-func New(env *Env, cmd *Args, args []string) (*Executor, error) {
+func New(env *Env, args []string) (*Executor, error) {
 
 	//初始化模版
-	tp, err := tmpl.NewEngine(cmd.Lang)
+	tp, err := tmpl.NewEngine(env.Lang)
 	if err != nil {
 		return nil, err
 	}
@@ -57,18 +59,56 @@ func New(env *Env, cmd *Args, args []string) (*Executor, error) {
 	}, nil
 }
 
-func (e *Executor) Run(cmd *Args, args []string) error {
+func (e *Executor) Run(cmd *Args) error {
 
 	//target language
 	LANG := cmd.Lang
-	typeConvert := lang.NewConvert(LANG, e.env.Rename)
+	typeConvert := lang.NewConvert(LANG, e.env.TypeAlias)
 	e.convert = typeConvert
 
+	var outRefs []*tmpl.Ref
+	var outApis []*tmpl.Api
+	var err error
+
 	//加载数据
-	outRefs, outApis, err := v3.LoadParse(e.env.Endpoint)
+	if e.env.Version == "v2" {
+		outRefs, outApis, err = v2.LoadParse(e.env.Endpoint)
+	} else if e.env.Version == "v3" {
+		outRefs, outApis, err = v3.LoadParse(e.env.Endpoint)
+	} else {
+		return errors.New("invalid version")
+	}
+
 	if err != nil {
 		return err
 	}
+
+	// 过滤 path
+	// path 过滤
+	filter := e.env.Filter
+	ignore := e.env.Ignore
+	lo.ForEach(outApis, func(item *tmpl.Api, index int) {
+		item.Paths = lo.Filter(item.Paths, func(p *tmpl.Path, index int) bool {
+			path := p.Path
+			_, ignoreMatch := lo.Find(ignore, func(p string) bool {
+				return strings.HasPrefix(path, p)
+			})
+			if ignoreMatch {
+				return false
+			}
+
+			if len(filter) > 0 {
+				_, filterMatch := lo.Find(filter, func(p string) bool {
+					return strings.HasPrefix(path, p)
+				})
+				return filterMatch
+			}
+			return true
+		})
+	})
+	outApis = lo.Filter(outApis, func(item *tmpl.Api, index int) bool {
+		return len(item.Paths) > 0
+	})
 
 	//排序
 	slices.SortFunc(outRefs, func(a, b *tmpl.Ref) int {
@@ -78,25 +118,6 @@ func (e *Executor) Run(cmd *Args, args []string) error {
 	slices.SortFunc(outApis, func(a, b *tmpl.Api) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
-
-	// 过滤 path
-	if filter := cmd.Filter; len(filter) > 0 {
-
-		// path 过滤
-		lo.ForEach(outApis, func(item *tmpl.Api, index int) {
-			item.Paths = lo.Filter(item.Paths, func(p *tmpl.Path, index int) bool {
-				path := p.Path
-				_, match := lo.Find(filter, func(p string) bool {
-					return strings.HasPrefix(path, p)
-				})
-				return match
-			})
-		})
-
-		outApis = lo.Filter(outApis, func(item *tmpl.Api, index int) bool {
-			return len(item.Paths) > 0
-		})
-	}
 
 	//是否需要生成泛型
 	if e.env.Generics.Enable {
@@ -158,7 +179,7 @@ func (e *Executor) Run(cmd *Args, args []string) error {
 
 			property.Type.GenerateExpression(property.Format, typeConvert)
 
-			property.Alias = cmp.Or(e.env.Alias[property.Name], property.Name)
+			property.Alias = cmp.Or(e.env.PropertyAlias[property.Name], property.Name)
 		}
 
 		//是否确定导出
@@ -171,7 +192,7 @@ func (e *Executor) Run(cmd *Args, args []string) error {
 		}
 
 		//别名
-		ref.Alias = cmp.Or(e.env.Alias[ref.Name], ref.Name)
+		ref.Alias = cmp.Or(e.env.PropertyAlias[ref.Name], ref.Name)
 	}
 
 	//查询
@@ -204,9 +225,8 @@ func (e *Executor) Run(cmd *Args, args []string) error {
 			//参数转换
 			for _, parameter := range path.Parameters {
 				parameter.Type.GenerateExpression(parameter.Format, typeConvert)
-
 				//别名
-				parameter.Alias = cmp.Or(e.env.Alias[parameter.Name], parameter.Name)
+				parameter.Alias = cmp.Or(e.env.PropertyAlias[parameter.Name], parameter.Name)
 			}
 
 			//排序

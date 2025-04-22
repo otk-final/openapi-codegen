@@ -1,6 +1,11 @@
-package v3
+package v2
 
-import "strings"
+import (
+	"cmp"
+	"codegen/tmpl"
+	"github.com/samber/lo"
+	"strings"
+)
 
 type Tag struct {
 	Name        string `json:"name,omitempty"`
@@ -14,32 +19,12 @@ type Method struct {
 	Summary     string              `json:"summary,omitempty"`
 	OperationId string              `json:"operationId,omitempty"`
 	Responses   map[string]Response `json:"responses,omitempty"`
-	RequestBody RequestBody         `json:"requestBody,omitempty"`
 	Parameters  []Parameter         `json:"parameters,omitempty"`
 }
 
 type Response struct {
-	Description string  `json:"description,omitempty"`
-	Content     Content `json:"content,omitempty"`
-	Ref         string  `json:"$ref,omitempty"`
-}
-
-type RequestBody struct {
-	Description string  `json:"description,omitempty"`
-	Content     Content `json:"content,omitempty"`
-	Ref         string  `json:"$ref,omitempty"`
-}
-
-type Content = map[string]struct {
-	Schema Schema `json:"schema,omitempty"`
-}
-
-type Parameter struct {
-	Name        string `json:"name,omitempty"`
-	In          string `json:"in,omitempty"`
-	Required    bool   `json:"required,omitempty"`
-	Schema      Schema `json:"schema,omitempty"`
 	Description string `json:"description,omitempty"`
+	Schema      Schema `json:"schema,omitempty"`
 }
 
 type Schema struct {
@@ -51,6 +36,14 @@ type Schema struct {
 		Ref  string `json:"$ref,omitempty"`
 	} `json:"items,omitempty"`
 	Default interface{} `json:"default,omitempty"`
+}
+
+type Parameter struct {
+	Schema
+	Name        string `json:"name,omitempty"`
+	In          string `json:"in,omitempty"`
+	Required    bool   `json:"required,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 type Mode struct {
@@ -65,9 +58,36 @@ type Property struct {
 	Enum        []any  `json:"enum,omitempty"`
 }
 
-type RefPath string
+type schemaType Schema
 
-func (r RefPath) BaseName() string {
+func (s schemaType) Parse() *tmpl.NamedType {
+
+	var expression string
+	var kind tmpl.NamedTypeKind
+
+	if s.Ref != "" {
+		kind = tmpl.ReferenceType
+		expression = s.Ref
+	} else {
+		if s.Type == "array" {
+			expression = cmp.Or(s.Items.Type, s.Items.Ref)
+			kind = lo.Ternary(expression == s.Items.Type, tmpl.ArrayType|tmpl.FoundationType, tmpl.ArrayType|tmpl.ReferenceType)
+		} else {
+			expression = cmp.Or(s.Type, s.Ref)
+			kind = lo.Ternary(expression == s.Type, tmpl.FoundationType, tmpl.ReferenceType)
+		}
+	}
+
+	if expression == "" {
+		return nil
+	}
+
+	return &tmpl.NamedType{Kind: kind, Expression: ModePath(expression).BaseName()}
+}
+
+type ModePath string
+
+func (r ModePath) BaseName() string {
 	x := r[strings.LastIndex(string(r), "/")+1:]
 	return string(x)
 }
