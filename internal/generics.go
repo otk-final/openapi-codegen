@@ -145,15 +145,15 @@ func resolvingGenerics(convert lang.TypeConvert, expressions map[string][]string
 			if lo.Contains(discriminators, property.Name) {
 				//对象泛型
 				expression = placeholders[idx]
-				kind = tmpl.ImmutableType | tmpl.GenericType | property.Type.Kind //属性设置不可变
+				kind = tmpl.ImmutableType | tmpl.GenericType //属性设置不可变
 			} else if lo.Contains(discriminators, fmt.Sprintf("%s+", property.Name)) { //集合泛型
 				//集合泛型
 				expression = convert.Array(placeholders[idx])
-				kind = tmpl.ImmutableType | tmpl.ArrayType | tmpl.GenericType | property.Type.Kind //属性设置不可变
+				kind = tmpl.ImmutableType | tmpl.ArrayType | tmpl.GenericType //属性设置不可变
 			} else if lo.Contains(discriminators, fmt.Sprintf("%s~", property.Name)) { //Map泛型
 				//集合泛型
 				expression = convert.Map(placeholders[idx])
-				kind = tmpl.ImmutableType | tmpl.MapType | tmpl.GenericType | property.Type.Kind //属性设置不可变
+				kind = tmpl.ImmutableType | tmpl.MapType | tmpl.GenericType //属性设置不可变
 			} else {
 				//其他类型
 				properties = append(properties, property)

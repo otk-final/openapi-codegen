@@ -57,6 +57,8 @@ func (w *stdWriter) api(output string, name string, engine *template.Template) e
 		if err != nil {
 			return err
 		}
+
+		fmt.Printf("[struct] %s - %s \n", ref.Name, ref.Description)
 	}
 
 	// 写入 api
@@ -65,6 +67,7 @@ func (w *stdWriter) api(output string, name string, engine *template.Template) e
 		if err != nil {
 			return err
 		}
+		fmt.Printf("[api] %s - %s \n", api.Name, api.Description)
 	}
 
 	//不存在则创建目录

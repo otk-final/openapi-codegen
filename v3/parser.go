@@ -107,7 +107,8 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 			p := &tmpl.Path{
 				Tag:         lo.Ternary(len(fn.Tags) > 0, fn.Tags[0], "UnnamedApi"),
 				Name:        fn.OperationId,
-				Description: fn.Summary,
+				Description: fn.Description,
+				Summary:     fn.Summary,
 				Path:        path,
 				Method:      method,
 				Parameters:  toParameters(method, fn),
@@ -147,14 +148,14 @@ func (s schemaType) Parse() *tmpl.NamedType {
 		kind = tmpl.ReferenceType
 		expression = s.Ref
 	} else {
-		if s.Type == "array" {
+		if s.Items != nil {
 			//arr
 			expression = cmp.Or(s.Items.Type, s.Items.Ref)
 			kind = lo.Ternary(expression == s.Items.Type, tmpl.ArrayType|tmpl.FoundationType, tmpl.ArrayType|tmpl.ReferenceType)
-		} else if s.Type == "object" {
+		} else if s.AdditionalProperties != nil {
 			//map
 			expression = cmp.Or(s.AdditionalProperties.Type, s.AdditionalProperties.Ref)
-			kind = lo.Ternary(expression == s.Items.Type, tmpl.MapType|tmpl.FoundationType, tmpl.MapType|tmpl.ReferenceType)
+			kind = lo.Ternary(expression == s.AdditionalProperties.Type, tmpl.MapType|tmpl.FoundationType, tmpl.MapType|tmpl.ReferenceType)
 		} else {
 			expression = cmp.Or(s.Type, s.Ref)
 			kind = lo.Ternary(expression == s.Type, tmpl.FoundationType, tmpl.ReferenceType)

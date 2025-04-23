@@ -15,6 +15,7 @@ type Path struct {
 	Tag         string
 	Name        string
 	Description string
+	Summary     string
 	Path        string
 	Method      string
 	Parameters  Parameters

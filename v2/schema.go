@@ -17,6 +17,7 @@ type Path = map[string]Method
 type Method struct {
 	Tags        []string            `json:"tags,omitempty"`
 	Summary     string              `json:"summary,omitempty"`
+	Description string              `json:"description,omitempty"`
 	OperationId string              `json:"operationId,omitempty"`
 	Responses   map[string]Response `json:"responses,omitempty"`
 	Parameters  []Parameter         `json:"parameters,omitempty"`
@@ -31,10 +32,14 @@ type Schema struct {
 	Type   string `json:"type,omitempty"`
 	Format string `json:"format,omitempty"`
 	Ref    string `json:"$ref,omitempty"`
-	Items  struct {
+	Items  *struct {
 		Type string `json:"type,omitempty"`
 		Ref  string `json:"$ref,omitempty"`
 	} `json:"items,omitempty"`
+	AdditionalProperties *struct {
+		Type string `json:"type,omitempty"`
+		Ref  string `json:"$ref,omitempty"`
+	} `json:"additionalProperties,omitempty"`
 	Default interface{} `json:"default,omitempty"`
 }
 
@@ -69,9 +74,14 @@ func (s schemaType) Parse() *tmpl.NamedType {
 		kind = tmpl.ReferenceType
 		expression = s.Ref
 	} else {
-		if s.Type == "array" {
+		if s.Items != nil {
+			//array
 			expression = cmp.Or(s.Items.Type, s.Items.Ref)
 			kind = lo.Ternary(expression == s.Items.Type, tmpl.ArrayType|tmpl.FoundationType, tmpl.ArrayType|tmpl.ReferenceType)
+		} else if s.AdditionalProperties != nil {
+			//map
+			expression = cmp.Or(s.AdditionalProperties.Type, s.AdditionalProperties.Ref)
+			kind = lo.Ternary(expression == s.AdditionalProperties.Type, tmpl.MapType|tmpl.FoundationType, tmpl.MapType|tmpl.ReferenceType)
 		} else {
 			expression = cmp.Or(s.Type, s.Ref)
 			kind = lo.Ternary(expression == s.Type, tmpl.FoundationType, tmpl.ReferenceType)

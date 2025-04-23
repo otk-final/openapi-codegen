@@ -182,7 +182,9 @@ func (e *Executor) Run(cmd *Args) error {
 		//属性转换
 		for _, property := range properties {
 
-			property.Type.GenerateExpression(property.Format, typeConvert)
+			if property.Type != nil {
+				property.Type.GenerateExpression(property.Format, typeConvert)
+			}
 
 			property.Alias = cmp.Or(e.env.PropertyAlias[property.Name], property.Name)
 		}
@@ -262,10 +264,12 @@ func (e *Executor) Run(cmd *Args) error {
 
 	//写入接口
 	err = w.api(e.env.Output, "header", e.engine)
+	if err != nil {
+		return err
+	}
 
 	//写入接口适配
 	err = w.client(e.env.ClientOutput, "client", e.engine)
-
 	return err
 }
 

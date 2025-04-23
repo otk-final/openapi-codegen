@@ -12,6 +12,7 @@ type Path = map[string]Method
 type Method struct {
 	Tags        []string            `json:"tags,omitempty"`
 	Summary     string              `json:"summary,omitempty"`
+	Description string              `json:"description,omitempty"`
 	OperationId string              `json:"operationId,omitempty"`
 	Responses   map[string]Response `json:"responses,omitempty"`
 	RequestBody RequestBody         `json:"requestBody,omitempty"`
@@ -46,11 +47,11 @@ type Schema struct {
 	Type   string `json:"type,omitempty"`
 	Format string `json:"format,omitempty"`
 	Ref    string `json:"$ref,omitempty"`
-	Items  struct {
+	Items  *struct {
 		Type string `json:"type,omitempty"`
 		Ref  string `json:"$ref,omitempty"`
 	} `json:"items,omitempty"`
-	AdditionalProperties struct {
+	AdditionalProperties *struct {
 		Type string `json:"type,omitempty"`
 		Ref  string `json:"$ref,omitempty"`
 	} `json:"additionalProperties,omitempty"`

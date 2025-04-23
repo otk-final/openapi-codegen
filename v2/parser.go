@@ -118,7 +118,8 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 			p := &tmpl.Path{
 				Tag:         lo.Ternary(len(fn.Tags) > 0, fn.Tags[0], "UnnamedApi"),
 				Name:        fn.OperationId,
-				Description: fn.Summary,
+				Description: fn.Description,
+				Summary:     fn.Summary,
 				Path:        path,
 				Method:      method,
 				Parameters:  toParameters(method, fn),

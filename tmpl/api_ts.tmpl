@@ -74,6 +74,7 @@ export const {{.Name}} = {
 
 {{define "path"}}
 	/**
+	 * {{.Summary}}
 	 * {{.Description}}
 	 */
 	{{.Name}}: async ({{template "parameters" .}}) => {
