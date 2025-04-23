@@ -41,6 +41,8 @@ const (
 
 	FoundationType
 
+	MapType
+
 	ArrayType
 
 	ReferenceType
@@ -75,6 +77,9 @@ func (nk NamedTypeKind) Parse(expression string, format string, convert lang.Typ
 	}
 	if nk&ArrayType != 0 {
 		expression = convert.Array(expression)
+	}
+	if nk&MapType != 0 {
+		expression = convert.Map(expression)
 	}
 	return expression
 }
@@ -119,9 +124,4 @@ type Property struct {
 	Type        *NamedType
 	Format      string
 	Enums       []string
-}
-
-type GenericProperty struct {
-	Parent   string
-	Property *Property
 }

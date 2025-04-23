@@ -30,6 +30,10 @@ func (g *goConvert) Foundation(name string, format string) string {
 	}
 }
 
+func (g *goConvert) Map(sub string) string {
+	return fmt.Sprintf("map[string]%s", sub)
+}
+
 func (g *goConvert) Array(sub string) string {
 	return fmt.Sprintf("[]%s", sub)
 }

@@ -38,7 +38,7 @@ func (n *nestingGeneric) discriminator(convert lang.TypeConvert) string {
 
 func (n *nestingGeneric) unfold() {
 	//多类型忽略
-	if len(n.Subs) > 1 {
+	if len(n.Subs) != 1 {
 		return
 	}
 	*n = *n.Subs[0]
@@ -104,6 +104,12 @@ func (n *nestingGenericManage) recursion(current *nestingGeneric, generic, examp
 			if property.Type.Kind&tmpl.ArrayType != 0 {
 				next.Kind = nextKind ^ tmpl.ArrayType
 			}
+
+			//防止数组类型冲突，排除
+			if property.Type.Kind&tmpl.MapType != 0 {
+				next.Kind = nextKind ^ tmpl.MapType
+			}
+
 			next.Format = nextFormat
 			next.Expression = nextExpression
 		}
@@ -144,6 +150,10 @@ func resolvingGenerics(convert lang.TypeConvert, expressions map[string][]string
 				//集合泛型
 				expression = convert.Array(placeholders[idx])
 				kind = tmpl.ImmutableType | tmpl.ArrayType | tmpl.GenericType | property.Type.Kind //属性设置不可变
+			} else if lo.Contains(discriminators, fmt.Sprintf("%s~", property.Name)) { //Map泛型
+				//集合泛型
+				expression = convert.Map(placeholders[idx])
+				kind = tmpl.ImmutableType | tmpl.MapType | tmpl.GenericType | property.Type.Kind //属性设置不可变
 			} else {
 				//其他类型
 				properties = append(properties, property)

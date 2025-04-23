@@ -165,7 +165,6 @@ func (e *Executor) Run(cmd *Args) error {
 				ref.Type.Expression = val.discriminator(typeConvert)
 			}
 
-			//TODO 属性中是否存在泛型
 			newRefs = append(newRefs, ref)
 		}
 		outRefs = newRefs
@@ -203,11 +202,13 @@ func (e *Executor) Run(cmd *Args) error {
 
 	//查询
 	findType := func(currenType *tmpl.NamedType) *tmpl.NamedType {
+
 		currenName := currenType.Expression
 		match, ok := lo.Find(outRefs, func(item *tmpl.Ref) bool {
 			return item.Name == currenName
 		})
-		if ok {
+
+		if ok && match.Type.Kind&tmpl.GenericType != 0 {
 			return match.Type
 		}
 

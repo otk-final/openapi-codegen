@@ -95,19 +95,8 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 	}
 
 	toResponse := func(method string, info Method) *tmpl.NamedType {
-
-		var refPath string
 		response := info.Responses["200"]
-		if response.Ref != "" {
-			refPath = response.Ref
-		} else {
-			refPath = response.Content["*/*"].Schema.Ref
-		}
-
-		return &tmpl.NamedType{
-			Kind:       tmpl.ReferenceType,
-			Expression: RefPath(refPath).BaseName(),
-		}
+		return schemaType(response.Content["*/*"].Schema).Parse()
 	}
 
 	//paths
@@ -159,8 +148,13 @@ func (s schemaType) Parse() *tmpl.NamedType {
 		expression = s.Ref
 	} else {
 		if s.Type == "array" {
+			//arr
 			expression = cmp.Or(s.Items.Type, s.Items.Ref)
 			kind = lo.Ternary(expression == s.Items.Type, tmpl.ArrayType|tmpl.FoundationType, tmpl.ArrayType|tmpl.ReferenceType)
+		} else if s.Type == "object" {
+			//map
+			expression = cmp.Or(s.AdditionalProperties.Type, s.AdditionalProperties.Ref)
+			kind = lo.Ternary(expression == s.Items.Type, tmpl.MapType|tmpl.FoundationType, tmpl.MapType|tmpl.ReferenceType)
 		} else {
 			expression = cmp.Or(s.Type, s.Ref)
 			kind = lo.Ternary(expression == s.Type, tmpl.FoundationType, tmpl.ReferenceType)

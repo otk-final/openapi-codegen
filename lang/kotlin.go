@@ -28,6 +28,10 @@ func (k *kotlinConvert) Foundation(name string, format string) string {
 	}
 }
 
+func (k *kotlinConvert) Map(sub string) string {
+	return fmt.Sprintf("Map<String:%s>", sub)
+}
+
 func (k *kotlinConvert) Array(sub string) string {
 	return fmt.Sprintf("Array<%s>", sub)
 }

@@ -20,6 +20,8 @@ type TypeConvert interface {
 	Foundation(name string, format string) string
 	// Array 数组
 	Array(sub string) string
+	// Map 字典
+	Map(sub string) string
 	// Generic 泛型
 	Generic(parentType string, mode GenericMode, subTypes ...string) string
 }
@@ -79,6 +81,10 @@ func (l *extendConverts) Foundation(name string, format string) string {
 
 func (l *extendConverts) Array(sub string) string {
 	return l.handler[l.target].Array(sub)
+}
+
+func (l *extendConverts) Map(sub string) string {
+	return l.handler[l.target].Map(sub)
 }
 
 func (l *extendConverts) Generic(parentType string, mode GenericMode, subTypes ...string) string {

@@ -27,6 +27,10 @@ func (p *pythonConvert) Foundation(name string, format string) string {
 	}
 }
 
+func (p *pythonConvert) Map(sub string) string {
+	return fmt.Sprintf("dict[str:%s]", sub)
+}
+
 func (p *pythonConvert) Array(sub string) string {
 	return fmt.Sprintf("[%s]", sub)
 }

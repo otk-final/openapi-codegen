@@ -50,6 +50,10 @@ type Schema struct {
 		Type string `json:"type,omitempty"`
 		Ref  string `json:"$ref,omitempty"`
 	} `json:"items,omitempty"`
+	AdditionalProperties struct {
+		Type string `json:"type,omitempty"`
+		Ref  string `json:"$ref,omitempty"`
+	} `json:"additionalProperties,omitempty"`
 	Default interface{} `json:"default,omitempty"`
 }
 

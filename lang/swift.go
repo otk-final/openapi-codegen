@@ -33,6 +33,10 @@ func (s *swiftConvert) Array(sub string) string {
 	return fmt.Sprintf("[%s]", sub)
 }
 
+func (s *swiftConvert) Map(sub string) string {
+	return fmt.Sprintf("[string:%s]", sub)
+}
+
 func (s *swiftConvert) Generic(parentType string, mode GenericMode, subTypes ...string) string {
 	if mode == TypeGenericMode {
 		subTypes = lo.Map(subTypes, func(item string, index int) string {
