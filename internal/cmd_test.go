@@ -6,9 +6,9 @@ import (
 )
 
 var testArgs = &Args{
-	Version:  "v3",
-	Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
-	//Endpoint: "http://localhost:8083/v3/api-docs",
+	Version: "v3",
+	//Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
+	Endpoint: "http://localhost:8083/v3/api-docs",
 	//Endpoint: "http://localhost:8082/v2/api-docs",
 
 	Output:       "/Users/hxy/develops/xhm/XHM-Admin/src/gc/demo.tsx",
@@ -31,8 +31,11 @@ func TestCmd(t *testing.T) {
 		Args: testArgs,
 		Ignore: []string{
 			"/error",
+			"/pt",
 		},
-		Filter: []string{},
+		Filter: []string{
+			//"/pb/product",
+		},
 		TypeAlias: map[string]string{
 			//"JsonNode": "[String:String]",
 			//"object":   "[String:String]",
@@ -43,11 +46,12 @@ func TestCmd(t *testing.T) {
 			//"type": "type2",
 		},
 		Generics: &Generics{
-			Enable: true,
+			Enable: false,
 			Unfold: false,
 			Expressions: map[string][]string{
 				"ApiResult": {"data"},
 				"PageData":  {"entities+"},
+				"MapResult": {"data~"},
 			},
 		},
 		Variables: map[string]string{

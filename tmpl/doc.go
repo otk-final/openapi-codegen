@@ -12,15 +12,16 @@ type Api struct {
 }
 
 type Path struct {
-	Tag         string
-	Name        string
-	Description string
-	Summary     string
-	Path        string
-	Method      string
-	Parameters  Parameters
-	Request     *NamedType
-	Response    *NamedType
+	Tag          string
+	Name         string
+	Description  string
+	Summary      string
+	OriginalPath string
+	Path         string
+	Method       string
+	Parameters   Parameters
+	Request      *NamedType
+	Response     *NamedType
 }
 
 type Parameter struct {

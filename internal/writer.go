@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"codegen/tmpl"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"slices"
@@ -53,21 +52,29 @@ func (w *stdWriter) api(output string, name string, engine *template.Template) e
 			continue
 		}
 
-		err := engine.ExecuteTemplate(buf, "struct", ref)
-		if err != nil {
-			return err
-		}
-
 		fmt.Printf("[struct] %s - %s \n", ref.Name, ref.Description)
+
+		err = engine.ExecuteTemplate(buf, "struct", ref)
+		if err != nil {
+			fmt.Printf("error %s", err.Error())
+			continue
+		}
 	}
 
 	// 写入 api
 	for _, api := range w.apis {
-		err := engine.ExecuteTemplate(buf, "api", api)
-		if err != nil {
-			return err
-		}
 		fmt.Printf("[api] %s - %s \n", api.Name, api.Description)
+
+		err = engine.ExecuteTemplate(buf, "api", api)
+		if err != nil {
+			fmt.Printf("error %s", err.Error())
+			continue
+		}
+
+		for _, p := range api.Paths {
+			fmt.Printf(" ├─[%s] %s - %s \n", p.Method, p.OriginalPath, p.Summary)
+		}
+
 	}
 
 	//不存在则创建目录
@@ -141,7 +148,6 @@ func (w *javaWriter) api(output string, name string, engine *template.Template) 
 		apiFile := path.Join(output, "api", fmt.Sprintf("%s.java", api.Name))
 		err := fileWriter.api(apiFile, "apiHeader", engine)
 		if err != nil {
-			log.Print("err", err.Error())
 			return err
 		}
 	}

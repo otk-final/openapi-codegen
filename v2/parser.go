@@ -116,15 +116,16 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		for method, fn := range item {
 
 			p := &tmpl.Path{
-				Tag:         lo.Ternary(len(fn.Tags) > 0, fn.Tags[0], "UnnamedApi"),
-				Name:        fn.OperationId,
-				Description: fn.Description,
-				Summary:     fn.Summary,
-				Path:        path,
-				Method:      method,
-				Parameters:  toParameters(method, fn),
-				Request:     toRequest(method, fn),
-				Response:    toResponse(method, fn),
+				Tag:          lo.Ternary(len(fn.Tags) > 0, fn.Tags[0], "UnnamedApi"),
+				Name:         fn.OperationId,
+				Description:  fn.Description,
+				Summary:      fn.Summary,
+				Path:         path,
+				OriginalPath: path,
+				Method:       method,
+				Parameters:   toParameters(method, fn),
+				Request:      toRequest(method, fn),
+				Response:     toResponse(method, fn),
 			}
 			paths = append(paths, p)
 		}
