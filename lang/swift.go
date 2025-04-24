@@ -34,7 +34,7 @@ func (s *swiftConvert) Array(sub string) string {
 }
 
 func (s *swiftConvert) Map(sub string) string {
-	return fmt.Sprintf("[string:%s]", sub)
+	return fmt.Sprintf("[String:%s]", sub)
 }
 
 func (s *swiftConvert) Generic(parentType string, mode GenericMode, subTypes ...string) string {

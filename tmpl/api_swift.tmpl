@@ -1,23 +1,24 @@
 {{define "header"}}
 import Foundation
-
+import Alamofire
 {{end}}
 
 {{define "client"}}
 import Foundation
+import Alamofire
 
 /**
  * TODO You need to implement the current protocol, which can refer to Alamofire or URLSession
  */
 protocol ApiClient {
 
-    func get<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+    func get<T:Codable>(_ path: String, _ params: Any?, _ type: T.Type) async throws -> T
 
-    func post<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+    func post<T:Codable>(_ path: String, _ params: Any?, _ type: T.Type) async throws -> T
 
-    func put<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+    func put<T:Codable>(_ path: String, _ params: Any?, _ type: T.Type) async throws -> T
 
-    func delete<Value: Codable>(_ path: String, _ params: Codable?, _ type: Value.Type) async throws -> Value
+    func delete<T:Codable>(_ path: String, _ params: Any?, _ type: T.Type) async throws -> T
 
 }
 {{end}}
@@ -27,7 +28,7 @@ protocol ApiClient {
 /**
  * {{.Description}}
  */
-public struct {{.Type.Expression}}: Codable {
+public struct {{.Type.Expression}}:Codable {
 	{{range $val :=.Properties -}}
 	//{{$val.Description}}
 	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
@@ -41,28 +42,23 @@ public struct {{.Type.Expression}}: Codable {
 	{{- if .Parameters -}}
 		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}_ {{$val.Alias}}:{{$val.Type.Expression}}{{end}}
 	{{- else -}}
-		{{if .Request}}_ params {{.Request.Expression}} {{end}}
+		{{if .Request}}_ params: {{.Request.Expression}} {{end}}
 	{{- end -}}
 {{end}}
 
 
 {{define "path"}}
-    {{if .Parameters}}
-    /**
-    * {{.Description}} method Params
-    */
-    struct {{CapitalizeLetter .Name}}Params: Codable {
-        {{range $idx,$val := .Parameters -}}
-        var {{$val.Name}}: {{$val.Type.Expression}}{{if $val.Required}}{{else}}?{{end}}
-        {{end}}
-    }
-    {{end}}
-
 	/**
 	 * {{.Description}}
 	 */
     func {{.Name}}({{template "parameters" .}}) async throws -> {{.Response.Expression}} {
-        return try await client.{{.Method}}({{.Path}}, params ,{{.Response.Expression}}.self)
+        {{if .Parameters -}}
+        var params: [String: Any?] = [:]
+        {{range $idx,$val := .Parameters -}}
+        params["{{$val.Name}}"] = {{$val.Alias}}
+        {{end}}
+        {{- end -}}
+        return try await client.{{.Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}nil{{end}} ,{{.Response.Expression}}.self)
     }
 {{end}}
 
