@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/samber/lo"
-	"regexp"
 	"slices"
 	"strings"
 	"text/template"
@@ -26,12 +25,18 @@ type Args struct {
 
 type Env struct {
 	*Args
-	Ignore        []string          `json:"ignore"`
-	Filter        []string          `json:"filter"`
-	TypeAlias     map[string]string `json:"typeAlias"`
-	PropertyAlias map[string]string `json:"propertyAlias"`
-	Variables     map[string]string `json:"variables"`
-	Generics      *Generics         `json:"generics"`
+	Ignore    []string          `json:"ignore"`
+	Filter    []string          `json:"filter"`
+	Alias     Alias             `json:"alias"`
+	Variables map[string]string `json:"variables"`
+	Generics  *Generics         `json:"generics"`
+}
+
+type Alias struct {
+	Properties map[string]string `json:"properties"`
+	Modes      map[string]string `json:"modes"`
+	Types      map[string]string `json:"types"`
+	Parameters map[string]string `json:"parameters"`
 }
 
 type Generics struct {
@@ -64,7 +69,7 @@ func (e *Executor) Run(cmd *Args) error {
 
 	//target language
 	LANG := cmd.Lang
-	typeConvert := lang.NewConvert(LANG, e.env.TypeAlias)
+	typeConvert := lang.NewConvert(LANG, e.env.Alias.Types)
 	e.convert = typeConvert
 
 	var outRefs []*tmpl.Ref
@@ -186,7 +191,7 @@ func (e *Executor) Run(cmd *Args) error {
 				property.Type.GenerateExpression(property.Format, typeConvert)
 			}
 
-			property.Alias = cmp.Or(e.env.PropertyAlias[property.Name], property.Name)
+			property.Alias = cmp.Or(e.env.Alias.Properties[property.Name], property.Name)
 		}
 
 		//是否确定导出
@@ -199,7 +204,7 @@ func (e *Executor) Run(cmd *Args) error {
 		}
 
 		//别名
-		ref.Alias = cmp.Or(e.env.PropertyAlias[ref.Name], ref.Name)
+		ref.Alias = cmp.Or(e.env.Alias.Modes[ref.Name], ref.Name)
 	}
 
 	//查询
@@ -220,6 +225,19 @@ func (e *Executor) Run(cmd *Args) error {
 	}
 
 	//匹配路径参数
+	joinPath := func(path *tmpl.Path) string {
+		parameters := path.Parameters
+
+		//存在路径参数
+		parameters = lo.Filter(parameters, func(item *tmpl.Parameter, idx int) bool {
+			return item.In == "path"
+		})
+
+		if len(parameters) > 0 {
+			return lang.Format(LANG, path.OriginalPath, e.env.Alias.Parameters)
+		}
+		return fmt.Sprintf(`"%s"`, path.Path)
+	}
 
 	//根据类型 生成表达式
 	for _, api := range outApis {
@@ -235,7 +253,7 @@ func (e *Executor) Run(cmd *Args) error {
 			for _, parameter := range path.Parameters {
 				parameter.Type.GenerateExpression(parameter.Format, typeConvert)
 				//别名
-				parameter.Alias = cmp.Or(e.env.PropertyAlias[parameter.Name], parameter.Name)
+				parameter.Alias = cmp.Or(e.env.Alias.Parameters[parameter.Name], parameter.Name)
 			}
 
 			//排序
@@ -244,7 +262,7 @@ func (e *Executor) Run(cmd *Args) error {
 			})
 
 			//路径
-			path.Path = joinPathVariable(LANG, path)
+			path.Path = joinPath(path)
 
 			//重新匹配
 			if path.Request != nil {
@@ -271,41 +289,4 @@ func (e *Executor) Run(cmd *Args) error {
 	//写入接口适配
 	err = w.client(e.env.ClientOutput, "client", e.engine)
 	return err
-}
-
-// 匹配路径参数
-func joinPathVariable(language string, path *tmpl.Path) string {
-
-	parameters := path.Parameters
-
-	//存在路径参数
-	paths := lo.Filter(parameters, func(item *tmpl.Parameter, idx int) bool {
-		return item.In == "path"
-	})
-
-	rawPath := path.Path
-	if len(paths) > 0 {
-
-		reg := regexp.MustCompile(`\{([^/]+?)\}`)
-		rawPath = reg.ReplaceAllStringFunc(rawPath, func(seg string) string {
-			key := reg.FindStringSubmatch(seg)[1]
-			switch language {
-			case "swift":
-				return fmt.Sprintf(`\(%s)`, key)
-			case "go", "golang":
-				return `" + fmt.Sprintf("%v",` + key + `) +"`
-			case "java":
-				return fmt.Sprintf(`" + %s +"`, key)
-			default:
-				return fmt.Sprintf(`" + params.%s +"`, key)
-			}
-		})
-	}
-
-	rawPath = `"` + rawPath + `"`
-	//处理结尾 +""
-	if strings.HasSuffix(rawPath, `+""`) {
-		return rawPath[:strings.LastIndex(rawPath, `+""`)]
-	}
-	return rawPath
 }

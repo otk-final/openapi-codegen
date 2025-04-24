@@ -36,17 +36,18 @@ func TestCmd(t *testing.T) {
 		Filter: []string{
 			//"/pb/product",
 		},
-		TypeAlias: map[string]string{
-			//"JsonNode": "[String:String]",
-			//"object":   "[String:String]",
-			"JsonNode": "any",
-			//"object": "JsonNode",
-		},
-		PropertyAlias: map[string]string{
-			//"type": "type2",
+		Alias: Alias{
+			Properties: map[string]string{},
+			Modes:      map[string]string{},
+			Types: map[string]string{
+				"JsonNode": "any",
+			},
+			Parameters: map[string]string{
+				//"type": "type2",
+			},
 		},
 		Generics: &Generics{
-			Enable: false,
+			Enable: true,
 			Unfold: false,
 			Expressions: map[string][]string{
 				"ApiResult": {"data"},
