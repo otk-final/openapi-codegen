@@ -7,22 +7,24 @@ import (
 var testArgs = &Args{
 	Version: "v3",
 	//Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
-	Endpoint: "http://localhost:8083/v3/api-docsx",
+	Endpoint: "http://localhost:8083/v3/api-docs",
 	//Endpoint: "http://localhost:8082/v2/api-docs",
 
-	Output:       "/Users/hxy/develops/openapi/client-ts/src/demo.ts",
-	ClientOutput: "/Users/hxy/develops/openapi/client-ts/src/client.ts",
+	//Output:       "/Users/hxy/develops/openapi/client-ts/src/demo.ts",
+	//ClientOutput: "/Users/hxy/develops/openapi/client-ts/src/client.ts",
 
 	//Output:       "/Users/hxy/develops/xhm/sts/sts/demo.swift",
 	//ClientOutput: "/Users/hxy/develops/xhm/sts/sts/client.swift",
-	//Output:  "/Users/hxy/develops/demo/sts/app/src/main/java/com/otk/sts/internal/Api.kt",
+
+	Output:       "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Api.kt",
+	ClientOutput: "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Client.kt",
 
 	//Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
 	//ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/demo/client.go",
 
 	//Output:  "/Users/hxy/develops/demo/internal/demo.py",
 	//Output:  "/Users/hxy/develops/openapi/openapi-server/v3/src/main/java/com/demo",
-	Lang: "ts",
+	Lang: "kotlin",
 }
 
 func TestCmd(t *testing.T) {
@@ -40,7 +42,7 @@ func TestCmd(t *testing.T) {
 			Properties: map[string]string{},
 			Modes:      map[string]string{},
 			Types: map[string]string{
-				"JsonNode": "any",
+				"JsonNode": "Any",
 			},
 			Parameters: map[string]string{
 				//"type": "type2",
@@ -48,7 +50,7 @@ func TestCmd(t *testing.T) {
 		},
 		Generics: &Generics{
 			Enable: true,
-			Unfold: false,
+			Unfold: true,
 			Expressions: map[string][]string{
 				"ApiResult": {"data"},
 				"PageData":  {"entities+"},
@@ -56,9 +58,9 @@ func TestCmd(t *testing.T) {
 			},
 		},
 		Variables: map[string]string{
-			"clientPackage": "demo",
-			"structPackage": "com.demo.dto",
-			"apiPackage":    "demo",
+			"clientPackage": "com.demo",
+			"structPackage": "com.demo",
+			"apiPackage":    "com.demo",
 		},
 	}
 	exe, err := New(env, []string{})

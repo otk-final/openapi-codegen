@@ -1,24 +1,13 @@
 {{define "header"}}
-package com.otk.sts.api
+package {{Variable .Variables "apiPackage"}};
 
+import {{Variable .Variables "clientPackage"}}.ApiClient;
 import java.io.Serializable
 
-/**
- * TODO You need to implement the current interface, which can refer to Retorfit or OkHttp
- */
-interface ApiClient {
-
-    suspend fun <P : Any, V : Any> get(path: String, params: P?): V
-
-    suspend fun <P : Any, V : Any> post(path: String, params: P?): V
-
-    suspend fun <P : Any, V : Any> put(path: String, params: P?): V
-
-    suspend fun <P : Any, V : Any> delete(path: String, params: P?): V
-
-}
-
 {{end}}
+
+
+
 
 
 {{define "struct"}}
@@ -35,34 +24,34 @@ data class {{.Type.Expression}} (
 {{end}}
 
 
-{{define "parameters"}}
-	{{- if .Parameters -}}
-		params : {{CapitalizeLetter .Name}}Params
-	{{- else -}}
-		params : {{if .Request}}{{.Request.Expression}}{{else}}Any? = null{{end}}
-	{{- end -}}
-{{end}}
+
 
 
 {{define "path"}}
-    {{if .Parameters}}
-    /**
-    * {{.Description}} method Params
-    */
-    data class {{CapitalizeLetter .Name}}Params(
-        {{range $idx,$val := .Parameters -}}
-        var {{$val.Name}}: {{$val.Type.Expression}}{{if $val.Required}}{{else}}?{{end}},
-        {{end}}
-    ): Serializable
-    {{end}}
-
 	/**
 	 * {{.Description}}
+	 * {{.Summary}}
 	 */
-    suspend fun {{.Name}}({{template "parameters" .}}):  {{.Response.Expression}} {
-        return client.{{.Method}}({{.Path}}, params)
+    suspend fun {{.Name}}({{template "parameters" .}}):  Result<{{.Response.Expression}}> {
+        {{if .Parameters -}}
+        val params = HashMap<String,Any>();
+        {{range $idx,$val := .Parameters -}}
+        params["{{$val.Name}}"] = {{$val.Alias}};
+        {{end}}
+        {{- end -}}
+        return client.{{.Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}null{{end}})
     }
 {{end}}
+
+
+{{define "parameters"}}
+	{{- if .Parameters -}}
+		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}}:{{$val.Type.Expression}}{{end}}
+	{{- else -}}
+		{{if .Request}}params: {{.Request.Expression}}{{end}}
+	{{- end -}}
+{{end}}
+
 
 
 {{define "api"}}
@@ -74,4 +63,80 @@ class {{.Name}}(private var client: ApiClient) {
 	{{template "path" $val}}
 	{{end}}
 }
+{{end}}
+
+
+{{define "client"}}
+
+package {{Variable .Variables "clientPackage"}};
+
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.QueryMap
+import retrofit2.http.Url
+import java.lang.reflect.Type
+
+/**
+ * TODO You need to implement the current interface, which can refer to Retorfit or OkHttp
+ */
+class ApiClient {
+
+    suspend fun <V : Any> get(path: String, params: Map<String, Any>?): Result<V> {
+        val noNullParams = params ?: emptyMap()
+        val type = object : TypeToken<V>() {}.type
+        return toResult(defaultClient.get(path, noNullParams), type)
+    }
+
+    suspend fun <P : Any, V : Any> post(path: String, params: P?): Result<V> {
+        val type = object : TypeToken<V>() {}.type
+        return toResult(defaultClient.post(path, params), type)
+    }
+
+    suspend fun <P : Any, V : Any> put(path: String, params: P?): Result<V> {
+        val type = object : TypeToken<V>() {}.type
+        return toResult(defaultClient.put(path, params), type)
+    }
+
+    suspend fun <P : Any, V : Any> delete(path: String, params: P?): Result<V> {
+        val type = object : TypeToken<V>() {}.type
+        return toResult(defaultClient.delete(path, params), type)
+    }
+
+    private fun <V : Any> toResult(resp: Response<ResponseBody>, type: Type): Result<V> {
+        return if (resp.isSuccessful) {
+            Result.success(defaultGson.fromJson(resp.body()!!.charStream(), type))
+        } else {
+            Result.failure(Exception("Request failed with status code: ${resp.code()}"))
+        }
+    }
+}
+
+
+var defaultGson = Gson()
+private var defaultClient =
+    Retrofit.Builder().baseUrl("{{.Endpoint}}").build().create(RetrofitClient::class.java)
+
+interface RetrofitClient {
+
+    @GET
+    suspend fun get(@Url path: String, @QueryMap(encoded = true) params: Map<String, @JvmSuppressWildcards Any>?): Response<ResponseBody>
+
+    @POST
+    suspend fun <P : Any> post(@Url path: String, @Body params: P?): Response<ResponseBody>
+
+    @PUT
+    suspend fun <P : Any> put(@Url path: String, @Body params: P?): Response<ResponseBody>
+
+    @DELETE
+    suspend fun <P : Any> delete(@Url path: String, @Body params: P?): Response<ResponseBody>
+}
+
 {{end}}

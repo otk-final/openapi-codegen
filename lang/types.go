@@ -133,7 +133,7 @@ func Format(lang string, path string, alias map[string]string) string {
 	case "swift":
 		return fmt.Sprintf(`String(format: "%s", %s)`, text, strings.Join(segments, ","))
 	case "kotlin", "python":
-		return fmt.Sprintf("%s.format(%s)", text, strings.Join(segments, ","))
+		return fmt.Sprintf(`"%s".format(%s)`, text, strings.Join(segments, ","))
 	}
 	return text
 }
