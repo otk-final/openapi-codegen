@@ -3,6 +3,7 @@ package v2
 import (
 	"codegen/tmpl"
 	"encoding/json"
+	"fmt"
 	"github.com/samber/lo"
 	"io"
 	"net/http"
@@ -15,6 +16,10 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil, fmt.Errorf("%s %s", http.StatusText(resp.StatusCode), addr)
+	}
+
 	defer func() {
 		_ = resp.Body.Close()
 	}()

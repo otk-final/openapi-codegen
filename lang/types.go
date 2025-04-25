@@ -3,6 +3,7 @@ package lang
 import (
 	"cmp"
 	"fmt"
+	"github.com/samber/lo"
 	"regexp"
 	"strings"
 )
@@ -43,6 +44,10 @@ func init() {
 	//handlers["rust"] = &tsConvert{}
 	//handlers["cpp"] = &tsConvert{}
 	//handlers["c#"] = &tsConvert{}
+}
+
+func Names() []string {
+	return lo.Keys(handlers)
 }
 
 func NewConvert(targetLang string, extendTypes map[string]string) TypeConvert {
