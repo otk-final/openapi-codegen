@@ -3,6 +3,7 @@ package {{Variable .Variables "apiPackage"}};
 
 import {{Variable .Variables "clientPackage"}}.ApiClient;
 import java.io.Serializable
+import com.google.gson.reflect.TypeToken
 
 {{end}}
 
@@ -28,6 +29,9 @@ data class {{.Type.Expression}} (
 
 
 {{define "path"}}
+
+
+    var {{.Name}}ResultType = object : TypeToken<{{.Response.Expression}}>() {}.type
 	/**
 	 * {{.Description}}
 	 * {{.Summary}}
@@ -39,7 +43,7 @@ data class {{.Type.Expression}} (
         params["{{$val.Name}}"] = {{$val.Alias}};
         {{end}}
         {{- end -}}
-        return client.{{.Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}null{{end}})
+        return client.{{.Method}}({{.Path}},{{.Name}}ResultType, {{if or .Parameters .Request}}params{{else}}{{end}})
     }
 {{end}}
 
@@ -71,7 +75,8 @@ class {{.Name}}(private var client: ApiClient) {
 package {{Variable .Variables "clientPackage"}};
 
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -89,33 +94,32 @@ import java.lang.reflect.Type
  */
 class ApiClient {
 
-    suspend fun <V : Any> get(path: String, params: Map<String, Any>?): Result<V> {
-        val noNullParams = params ?: emptyMap()
-        val type = object : TypeToken<V>() {}.type
-        return toResult(defaultClient.get(path, noNullParams), type)
+    suspend fun <V : Any> get(path: String, retType: Type, params: Map<String, Any>? = emptyMap()): Result<V> {
+        return toResult(defaultClient.get(path, params), retType)
     }
 
-    suspend fun <P : Any, V : Any> post(path: String, params: P?): Result<V> {
-        val type = object : TypeToken<V>() {}.type
-        return toResult(defaultClient.post(path, params), type)
+    suspend fun <P : Any, V : Any> post(path: String, retType: Type, params: P?): Result<V> {
+        return toResult(defaultClient.post(path, toBody(params)), retType)
     }
 
-    suspend fun <P : Any, V : Any> put(path: String, params: P?): Result<V> {
-        val type = object : TypeToken<V>() {}.type
-        return toResult(defaultClient.put(path, params), type)
+    suspend fun <P : Any, V : Any> put(path: String, retType: Type, params: P?): Result<V> {
+        return toResult(defaultClient.put(path, toBody(params)), retType)
     }
 
-    suspend fun <P : Any, V : Any> delete(path: String, params: P?): Result<V> {
-        val type = object : TypeToken<V>() {}.type
-        return toResult(defaultClient.delete(path, params), type)
+    suspend fun <P : Any, V : Any> delete(path: String, retType: Type, params: P?): Result<V> {
+        return toResult(defaultClient.delete(path, toBody(params)), retType)
     }
 
-    private fun <V : Any> toResult(resp: Response<ResponseBody>, type: Type): Result<V> {
+    private fun <V : Any> toResult(resp: Response<ResponseBody>, retType: Type): Result<V> {
         return if (resp.isSuccessful) {
-            Result.success(defaultGson.fromJson(resp.body()!!.charStream(), type))
+            Result.success(defaultGson.fromJson(resp.body()!!.charStream(), retType))
         } else {
             Result.failure(Exception("Request failed with status code: ${resp.code()}"))
         }
+    }
+
+    private fun <P : Any> toBody(params: P?): RequestBody? {
+        return RequestBody.create(MediaType.parse("application/json"), defaultGson.toJson(params))
     }
 }
 
@@ -130,13 +134,13 @@ interface RetrofitClient {
     suspend fun get(@Url path: String, @QueryMap(encoded = true) params: Map<String, @JvmSuppressWildcards Any>?): Response<ResponseBody>
 
     @POST
-    suspend fun <P : Any> post(@Url path: String, @Body params: P?): Response<ResponseBody>
+    suspend fun post(@Url path: String, @Body params: RequestBody?): Response<ResponseBody>
 
     @PUT
-    suspend fun <P : Any> put(@Url path: String, @Body params: P?): Response<ResponseBody>
+    suspend fun put(@Url path: String, @Body params: RequestBody?): Response<ResponseBody>
 
     @DELETE
-    suspend fun <P : Any> delete(@Url path: String, @Body params: P?): Response<ResponseBody>
+    suspend fun delete(@Url path: String, @Body params: RequestBody?): Response<ResponseBody>
 }
 
 {{end}}
