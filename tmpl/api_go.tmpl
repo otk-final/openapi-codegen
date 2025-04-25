@@ -1,5 +1,7 @@
 {{define "header"}}
 package {{Variable .Variables "apiPackage"}};
+
+import "fmt"
 {{end}}
 
 {{define "struct"}}
@@ -16,11 +18,11 @@ type {{.Type.Expression}} struct {
 
 // {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} {{.Path}}
 type {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} struct {
-    Client ApiClient[*{{.Response.Expression}}]
+    Client ApiClient[{{.Response.Expression}}]
 }
 
 // Call {{.Description}}
-func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call({{template "parameters" .}}) (*{{.Response.Expression}}, error) {
+func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call({{template "parameters" .}}) ({{.Response.Expression}}, error) {
     {{if .Parameters -}}
     params := map[string]any{}
     {{range $idx,$val := .Parameters -}}
@@ -49,7 +51,17 @@ func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call({{temp
 {{define "client"}}
 package {{Variable .Variables "clientPackage"}}
 
-// ApiClient TODO You need to implement the current interface, which can refer to std http
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+)
+
+
+// ApiClient TODO You need to implement the current interface
 type ApiClient[T any] interface {
 	Get(name string, params map[string]any) (T, error)
 
@@ -58,5 +70,92 @@ type ApiClient[T any] interface {
 	Put(name string, params any) (T, error)
 
 	Delete(name string, params any) (T, error)
+}
+
+type DefaultClient[T any] struct {
+	Host    string
+	Headers http.Header
+}
+
+func NewClient[T any](host string, headers http.Header) ApiClient[T] {
+	return &DefaultClient[T]{host, headers}
+}
+
+func (t *DefaultClient[T]) Get(name string, params map[string]any) (T, error) {
+
+	uri, _ := url.Parse(t.Host)
+	uri.Path = name
+
+	if params != nil {
+		query := url.Values{}
+		for k, v := range params {
+			query.Set(k, fmt.Sprintf("%v", v))
+		}
+		uri.RawQuery = query.Encode()
+	}
+
+	req := &http.Request{
+		Method: http.MethodGet,
+		URL:    uri,
+		Header: t.Headers,
+	}
+
+	return t.request(req)
+}
+
+func (t *DefaultClient[T]) Post(name string, params any) (T, error) {
+	return t.doBody(http.MethodPost, name, params)
+}
+
+func (t *DefaultClient[T]) Put(name string, params any) (T, error) {
+	return t.doBody(http.MethodPut, name, params)
+}
+
+func (t *DefaultClient[T]) Delete(name string, params any) (T, error) {
+	return t.doBody(http.MethodDelete, name, params)
+}
+
+func (t *DefaultClient[T]) doBody(method string, name string, params any) (T, error) {
+	uri, _ := url.Parse(t.Host)
+	uri.JoinPath(name)
+
+	req := &http.Request{
+		Method: method,
+		URL:    uri,
+		Header: t.Headers,
+	}
+
+	if params != nil {
+		body, _ := json.Marshal(params)
+		req.Body = io.NopCloser(bytes.NewBuffer(body))
+	}
+
+	return t.request(req)
+}
+func (t *DefaultClient[T]) request(req *http.Request) (T, error) {
+
+	var ret T
+
+	// call
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return ret, err
+	}
+
+	// read response
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return ret, err
+	}
+
+	//decode
+	err = json.Unmarshal(body, &ret)
+	if err != nil {
+		return ret, err
+	}
+	return ret, nil
 }
 {{end}}

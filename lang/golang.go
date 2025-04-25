@@ -11,7 +11,7 @@ type goConvert struct {
 
 func (g *goConvert) Reference(name string) string {
 	//return fmt.Sprintf("*%s", util.CapitalizeFirst(name))
-	return name
+	return fmt.Sprintf("*%s", name)
 }
 
 func (g *goConvert) Foundation(name string, format string) string {

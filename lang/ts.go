@@ -28,7 +28,7 @@ func (t *tsConvert) Array(sub string) string {
 }
 
 func (t *tsConvert) Map(sub string) string {
-	return fmt.Sprintf("Map<string,%s>", sub)
+	return fmt.Sprintf("Record<string,%s>", sub)
 }
 
 func (t *tsConvert) Generic(parentType string, mode GenericMode, subTypes ...string) string {

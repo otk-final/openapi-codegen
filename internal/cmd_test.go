@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"regexp"
 	"testing"
 )
 
@@ -11,11 +10,11 @@ var testArgs = &Args{
 	Endpoint: "http://localhost:8083/v3/api-docs",
 	//Endpoint: "http://localhost:8082/v2/api-docs",
 
-	//Output:       "/Users/hxy/develops/xhm/XHM-Admin/src/gc/demo.tsx",
-	//ClientOutput: "/Users/hxy/develops/xhm/XHM-Admin/src/gc/client.tsx",
+	Output:       "/Users/hxy/develops/openapi/client-ts/src/demo.ts",
+	ClientOutput: "/Users/hxy/develops/openapi/client-ts/src/client.ts",
 
-	Output:       "/Users/hxy/develops/xhm/sts/sts/demo.swift",
-	ClientOutput: "/Users/hxy/develops/xhm/sts/sts/client.swift",
+	//Output:       "/Users/hxy/develops/xhm/sts/sts/demo.swift",
+	//ClientOutput: "/Users/hxy/develops/xhm/sts/sts/client.swift",
 	//Output:  "/Users/hxy/develops/demo/sts/app/src/main/java/com/otk/sts/internal/Api.kt",
 
 	//Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
@@ -23,7 +22,7 @@ var testArgs = &Args{
 
 	//Output:  "/Users/hxy/develops/demo/internal/demo.py",
 	//Output:  "/Users/hxy/develops/openapi/openapi-server/v3/src/main/java/com/demo",
-	Lang: "swift",
+	Lang: "ts",
 }
 
 func TestCmd(t *testing.T) {
@@ -41,10 +40,10 @@ func TestCmd(t *testing.T) {
 			Properties: map[string]string{},
 			Modes:      map[string]string{},
 			Types: map[string]string{
-				"JsonNode": "Any",
+				"JsonNode": "any",
 			},
 			Parameters: map[string]string{
-				"type": "type2",
+				//"type": "type2",
 			},
 		},
 		Generics: &Generics{
@@ -71,13 +70,4 @@ func TestCmd(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-func TestReg(t *testing.T) {
-	text := "ApiResult<csla,abc>"
-
-	re := regexp.MustCompile(`^(\w+)<([\w,\s]+)>$`)
-	matches := re.FindStringSubmatch(text)
-	t.Log(matches)
-	//t.Log(strings.Split(matches[1], ","))
 }

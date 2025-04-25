@@ -3,9 +3,9 @@ import { ApiClient } from "./client"
 {{end}}
 
 {{define "client"}}
-import axios from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 
-export const baseClient = axios.create({
+export const axiosClient = axios.create({
     baseURL: "{{.Endpoint}}",
     headers: {
         'Content-Type': 'application/json;charset=utf-8'
@@ -14,23 +14,28 @@ export const baseClient = axios.create({
     withCredentials: false
 })
 
+axiosClient.interceptors.response.use((response: AxiosResponse) => {
+    return response.data
+}, (error: AxiosError) => {
+    return Promise.reject(error)
+})
 
 export const ApiClient = {
 
     get: async (path: string, params?: any) => {
-        return baseClient.get(path,{params:params}) as any
+        return await axiosClient.get(path,{params:params}) as any
     },
 
     post: async (path: string, params?: any) => {
-        return baseClient.post(path, params) as any
+        return await axiosClient.post(path, params) as any
     },
 
     put: async (path: string, params?: any) => {
-        return baseClient.put(path, params) as any
+        return await axiosClient.put(path, params) as any
     },
 
     delete: async (path: string, params?: any) => {
-        return baseClient.delete(path, params) as any
+        return await axiosClient.delete(path, params) as any
     },
 }
 {{end}}
