@@ -14,19 +14,21 @@ import Foundation
 protocol ApiClient {
     func get<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
 
-    func post<T: Codable>(_ path: String, _ params: Any?, _ tresultTypeype: T.Type) async throws -> T
+    func post<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
 
     func put<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
 
     func delete<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
 }
 
+var BASE_URL = "{{.Endpoint}}"
+
 struct AlamofireApiClient: ApiClient {
     var headers: HTTPHeaders?
 
     func get<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
-        var reqParams: Parameters? = params as? [String: Any]
-        return try await AF.request(path,
+        let reqParams: Parameters? = params as? [String: Any]
+        return try await AF.request("\(BASE_URL)\(path)",
                                     method: .get,
                                     parameters: reqParams,
                                     encoding: URLEncoding.default,
@@ -35,8 +37,8 @@ struct AlamofireApiClient: ApiClient {
     }
 
     func post<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
-        var reqParams: Parameters? = params as? Dictionary<String, any Sendable>
-        return try await AF.request(path,
+        let reqParams: Parameters? = params as? Dictionary<String, any Sendable>
+        return try await AF.request("\(BASE_URL)\(path)",
                                     method: .post,
                                     parameters: reqParams,
                                     encoding: JSONEncoding.default,
@@ -45,8 +47,8 @@ struct AlamofireApiClient: ApiClient {
     }
 
     func put<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
-        var reqParams: Parameters? = params as? Dictionary<String, any Sendable>
-        return try await AF.request(path,
+        let reqParams: Parameters? = params as? Dictionary<String, any Sendable>
+        return try await AF.request("\(BASE_URL)\(path)",
                                     method: .put,
                                     parameters: reqParams,
                                     encoding: JSONEncoding.default,
@@ -55,8 +57,8 @@ struct AlamofireApiClient: ApiClient {
     }
 
     func delete<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
-        var reqParams: Parameters? = params as? Dictionary<String, any Sendable>
-        return try await AF.request(path,
+        let reqParams: Parameters? = params as? Dictionary<String, any Sendable>
+        return try await AF.request("\(BASE_URL)\(path)",
                                     method: .delete,
                                     parameters: reqParams,
                                     encoding: JSONEncoding.default,
@@ -76,7 +78,7 @@ public struct {{.Type.Expression}}:Codable {
 	{{range $val :=.Properties -}}
 	//{{$val.Description}}
 	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
-	var {{$val.Name}}: {{$val.Type.Expression}}
+	var {{$val.Name}}: {{$val.Type.Expression}}?
 	{{end}}
 }
 {{end}}

@@ -118,6 +118,8 @@ func Format(lang string, path string, alias map[string]string) string {
 			return fmt.Sprintf("${params.%s}", segment)
 		case "go", "golang":
 			return "%v"
+		case "swift":
+			return "%@"
 		default:
 			return "%s"
 		}
