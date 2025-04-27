@@ -42,9 +42,9 @@ func NewEngine(lang string, style string) (*template.Template, error) {
 	}
 
 	switch lang {
-	case "ts":
+	case "ts", "typescript":
 		return tp.Parse(ts)
-	case "go":
+	case "go", "golang":
 		return tp.Parse(golang)
 	case "java":
 		return tp.Parse(java)

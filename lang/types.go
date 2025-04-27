@@ -36,9 +36,11 @@ var handlers = map[string]TypeConvert{}
 
 func init() {
 	handlers["ts"] = &tsConvert{}
+	handlers["typescript"] = &tsConvert{}
 	handlers["swift"] = &swiftConvert{}
 	handlers["java"] = &javaConvert{}
 	handlers["go"] = &goConvert{}
+	handlers["golang"] = &goConvert{}
 	handlers["kotlin"] = &kotlinConvert{}
 	handlers["python"] = &pythonConvert{}
 	//handlers["rust"] = &tsConvert{}
@@ -114,7 +116,7 @@ func Format(lang string, path string, alias map[string]string) string {
 		segments = append(segments, segment)
 
 		switch lang {
-		case "ts":
+		case "ts", "typescript":
 			return fmt.Sprintf("${params.%s}", segment)
 		case "go", "golang":
 			return "%v"
@@ -126,9 +128,9 @@ func Format(lang string, path string, alias map[string]string) string {
 	})
 
 	switch lang {
-	case "ts":
+	case "ts", "typescript":
 		return fmt.Sprintf("`%s`", text)
-	case "go":
+	case "go", "golang":
 		return fmt.Sprintf(`fmt.Sprintf("%s",%s)`, text, strings.Join(segments, ","))
 	case "java":
 		return fmt.Sprintf(`String.format("%s",%s)`, text, strings.Join(segments, ","))
