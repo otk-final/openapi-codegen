@@ -13,8 +13,8 @@ var testArgs = &Args{
 	//Output:       "/Users/hxy/develops/openapi/client-ts/src/demo.ts",
 	//ClientOutput: "/Users/hxy/develops/openapi/client-ts/src/client.ts",
 
-	Output:       "/Users/hxy/develops/openapi/client-swift-x/client-api/Api.swift",
-	ClientOutput: "/Users/hxy/develops/openapi/client-swift-x/client-api/Client.swift",
+	//Output:       "/Users/hxy/develops/openapi/client-swift-x/client-api/Api.swift",
+	//ClientOutput: "/Users/hxy/develops/openapi/client-swift-x/client-api/Client.swift",
 
 	//Output:       "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Api.kt",
 	//ClientOutput: "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Client.kt",
@@ -22,9 +22,11 @@ var testArgs = &Args{
 	//Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
 	//ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/demo/client.go",
 
-	//Output:  "/Users/hxy/develops/demo/internal/demo.py",
+	Output:       "/Users/hxy/develops/openapi/client-python/demo.py",
+	ClientOutput: "/Users/hxy/develops/openapi/client-python/client.py",
+
 	//Output:  "/Users/hxy/develops/openapi/openapi-server/v3/src/main/java/com/demo",
-	Lang: "swift",
+	Lang: "python",
 }
 
 func TestCmd(t *testing.T) {
@@ -42,7 +44,7 @@ func TestCmd(t *testing.T) {
 			Properties: map[string]string{},
 			Modes:      map[string]string{},
 			Types: map[string]string{
-				"JsonNode": "[String:String]",
+				"JsonNode": "Any",
 			},
 			Parameters: map[string]string{
 				//"type": "type2",

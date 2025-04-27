@@ -21,20 +21,8 @@ var swift string
 //go:embed api_python.tmpl
 var python string
 
-//go:embed api_dart.tmpl
-var dart string
-
 //go:embed api_java.tmpl
 var java string
-
-//go:embed api_cpp.tmpl
-var cpp string
-
-//go:embed api_rust.tmpl
-var rust string
-
-//go:embed api_oc.tmpl
-var oc string
 
 var tmplFunc = template.FuncMap{
 	"CapitalizeLetter": CapitalizeFirst,
@@ -54,12 +42,10 @@ func NewEngine(lang string, style string) (*template.Template, error) {
 	}
 
 	switch lang {
-	case "ts", "js":
+	case "ts":
 		return tp.Parse(ts)
-	case "go", "golang":
+	case "go":
 		return tp.Parse(golang)
-	case "c++", "cpp":
-		return tp.Parse(cpp)
 	case "java":
 		return tp.Parse(java)
 	case "kotlin":
@@ -68,12 +54,6 @@ func NewEngine(lang string, style string) (*template.Template, error) {
 		return tp.Parse(swift)
 	case "python":
 		return tp.Parse(python)
-	case "dart":
-		return tp.Parse(dart)
-	case "oc":
-		return tp.Parse(oc)
-	case "rust":
-		return tp.Parse(rust)
 	default:
 		return nil, errors.New("invalid language")
 	}

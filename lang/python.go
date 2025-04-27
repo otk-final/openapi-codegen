@@ -28,11 +28,11 @@ func (p *pythonConvert) Foundation(name string, format string) string {
 }
 
 func (p *pythonConvert) Map(sub string) string {
-	return fmt.Sprintf("dict[str:%s]", sub)
+	return fmt.Sprintf("Dict[str,%s]", sub)
 }
 
 func (p *pythonConvert) Array(sub string) string {
-	return fmt.Sprintf("[%s]", sub)
+	return fmt.Sprintf("List[%s]", sub)
 }
 
 func (p *pythonConvert) Generic(parentType string, mode GenericMode, subTypes ...string) string {

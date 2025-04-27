@@ -1,27 +1,14 @@
 {{define "header"}}
 from dataclasses import dataclass
-from typing import Generic, TypeVar, Optional, Any, Type
+from typing import Generic, TypeVar, Optional, Any, Type, List, Dict
+
+from client import ApiClient
 
 T = TypeVar('T')
 A = TypeVar('A')
 B = TypeVar('B')
 C = TypeVar('C')
 P = TypeVar('P')
-
-
-class ApiClient:
-
-    def get(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
-        ...
-
-    def post(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
-        ...
-
-    def put(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
-        ...
-
-    def delete(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
-        ...
 
 {{end}}
 
@@ -32,7 +19,7 @@ class {{.Type.Expression}}:
     {{.Name}} {{.Description}}
     """
 	{{range $val :=.Properties -}}
-	{{$val.Name}}: {{$val.Type.Expression}}
+	{{$val.Name}}: {{$val.Type.Expression}} = None
 	{{end}}
 {{end}}
 
@@ -56,20 +43,71 @@ class {{.Name}}:
 
 
 {{define "path"}}
-    {{if .Parameters}}
-    class {{CapitalizeLetter .Name}}Params:
-        """
-        {{.Description}} Params
-        """
-        {{range $idx,$val := .Parameters -}}
-        {{$val.Name}}: {{$val.Type.Expression}} = None
-        {{end}}
-    {{end}}
 
-
-    def {{.Name}}(self, params: {{if .Parameters}}{{CapitalizeLetter .Name}}Params = None{{else}}Any = None{{end}}) -> Optional[{{.Response.Expression}}]:
+    def {{.Name}}(self, {{template "parameters" .}}) -> Optional[{{.Response.Expression}}]:
         """
         {{.Description}}
         """
-        return self.client.{{.Method}}({{.Path}}, params ,{{.Response.Expression}}.self)
+        {{if .Parameters -}}
+        params = { {{range $idx,$val := .Parameters -}}"{{$val.Name}}": {{$val.Alias}},{{end}} }
+        {{- end -}}
+        return self.client.{{.Method}}({{.Path}}, {{.Response.Expression}}, {{if or .Parameters .Request}}params{{else}}None{{end}})
+{{end}}
+
+
+{{define "parameters"}}
+	{{- if .Parameters -}}
+		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}}:{{$val.Type.Expression}}{{end}}
+	{{- else -}}
+		{{if .Request}}params: {{.Request.Expression}}{{end}}
+	{{- end -}}
+{{end}}
+
+
+{{define "client"}}
+from typing import Generic, TypeVar, Optional, Any, Type
+import requests
+from dataclasses import asdict
+
+T = TypeVar('T')
+P = TypeVar('P')
+
+
+class ApiClient:
+
+    def get(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def post(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def put(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+    def delete(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        ...
+
+
+
+
+class HttClient(ApiClient):
+    BASE_URL = "{{.Endpoint}}"
+
+    def get(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        url = f"{self.BASE_URL}{path}"
+        return requests.get(url=url, params=params).json()
+
+    def post(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        url = f"{self.BASE_URL}{path}"
+        return requests.post(url=url, json=asdict(params)).json()
+
+    def put(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        url = f"{self.BASE_URL}{path}"
+        return requests.put(url=url, json=asdict(params)).json()
+
+    def delete(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
+        url = f"{self.BASE_URL}{path}"
+        return requests.delete(url=url, json=asdict(params)).json()
+
+
 {{end}}
