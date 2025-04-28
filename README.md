@@ -25,9 +25,11 @@ go build -o openapi
 
 ## Download - 1.0.0
 
-- [mac](https://github.com/otk-final/openapi-codegen/releases/download/1.0.0/openapi_darwin.zip)
-- [windows](https://github.com/otk-final/openapi-codegen/releases/download/1.0.0/openapi_windows.zip)
-- [linux](https://github.com/otk-final/openapi-codegen/releases/download/1.0.0/openapi_linux.zip)
+- [mac](https://github.com/otk-final/openapi-codegen/releases/download/v1.0.0/openapi_darwin.zip)
+- [windows](https://github.com/otk-final/openapi-codegen/releases/download/v1.0.0/openapi_windows.zip)
+- [linux](https://github.com/otk-final/openapi-codegen/releases/download/v1.0.0/openapi_linux.zip)
+
+安装并添加到环境变量
 
 ## Tutorial
 
