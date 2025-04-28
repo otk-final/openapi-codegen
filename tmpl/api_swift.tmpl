@@ -84,13 +84,11 @@ public struct {{.Type.Expression}}:Codable {
 {{end}}
 
 
+
 {{define "parameters"}}
-	{{- if .Parameters -}}
-		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}_ {{$val.Alias}}:{{$val.Type.Expression}}{{end}}
-	{{- else -}}
-		{{if .Request}}_ params: {{.Request.Expression}} {{end}}
-	{{- end -}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
 {{end}}
+
 
 
 {{define "path"}}
@@ -98,13 +96,15 @@ public struct {{.Type.Expression}}:Codable {
 	 * {{.Description}}
 	 */
     func {{.Name}}({{template "parameters" .}}) async throws -> {{.Response.Expression}} {
-        {{if .Parameters -}}
+        {{if .Queries}}
         var params: [String: Any?] = [:]
-        {{range $idx,$val := .Parameters -}}
+        {{range $idx,$val := .Queries -}}
         params["{{$val.Name}}"] = {{$val.Alias}}
-        {{end}}
-        {{- end -}}
-        return try await client.{{.Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}nil{{end}} ,{{.Response.Expression}}.self)
+        {{end -}}
+        {{- else -}}
+        {{if .Request}}{{else}}var params: [String: Any?] = [:]{{end}}
+        {{- end}}
+        return try await client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}} ,{{.Response.Expression}}.self)
     }
 {{end}}
 

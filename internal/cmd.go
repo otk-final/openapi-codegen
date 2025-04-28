@@ -256,18 +256,32 @@ func (e *Executor) Run(cmd *Args) error {
 				parameter.Alias = cmp.Or(e.env.Alias.Parameters[parameter.Name], parameter.Name)
 			}
 
-			//排序
+			//路径
+			path.Path = joinPath(path)
+
+			//全量参数
 			slices.SortFunc(path.Parameters, func(a, b *tmpl.Parameter) int {
 				return cmp.Compare(a.Name, b.Name)
 			})
 
-			//路径
-			path.Path = joinPath(path)
-
-			//重新匹配
+			//统一累计到参数集
 			if path.Request != nil {
-				path.Request = findType(path.Request)
+				path.Parameters = append(path.Parameters, &tmpl.Parameter{
+					Name:  "body",
+					Alias: "body",
+					In:    "body",
+					Type:  findType(path.Request),
+				})
 			}
+
+			//query参数
+			queries := lo.Filter(path.Parameters, func(item *tmpl.Parameter, index int) bool {
+				return item.In == "query"
+			})
+			slices.SortFunc(queries, func(a, b *tmpl.Parameter) int {
+				return cmp.Compare(a.Name, b.Name)
+			})
+			path.Queries = queries
 
 			if path.Response != nil {
 				path.Response = findType(path.Response)

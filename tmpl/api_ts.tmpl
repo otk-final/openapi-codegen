@@ -26,16 +26,16 @@ export const ApiClient = {
         return await axiosClient.get(path,{params:params}) as any
     },
 
-    post: async (path: string, params?: any) => {
-        return await axiosClient.post(path, params) as any
+    post: async (path: string, body?: any) => {
+        return await axiosClient.post(path, body) as any
     },
 
-    put: async (path: string, params?: any) => {
-        return await axiosClient.put(path, params) as any
+    put: async (path: string, body?: any) => {
+        return await axiosClient.put(path, body) as any
     },
 
-    delete: async (path: string, params?: any) => {
-        return await axiosClient.delete(path, params) as any
+    delete: async (path: string, body?: any) => {
+        return await axiosClient.delete(path, body) as any
     },
 }
 {{end}}
@@ -50,7 +50,7 @@ export interface {{.Type.Expression}} {
 	{{range $val :=.Properties -}}
 	//{{$val.Description}}
 	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
-	{{$val.Name}}: {{$val.Type.Expression}}
+	{{$val.Name}}?: {{$val.Type.Expression}}
 	{{end}}
 }
 {{end}}
@@ -69,11 +69,7 @@ export const {{.Name}} = {
 
 
 {{define "parameters"}}
-	{{- if .Parameters -}}
-		params:{ {{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}} {{$val.Name}} {{if $val.Required}}:{{else}}?:{{end}} {{$val.Type.Expression}}{{end}} }
-	{{- else -}}
-		{{if .Request}} params:{{.Request.Expression}} {{else}} params?:any {{end}}
-	{{- end -}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
 {{end}}
 
 
@@ -83,6 +79,11 @@ export const {{.Name}} = {
 	 * {{.Description}}
 	 */
 	{{.Name}}: async ({{template "parameters" .}}) => {
-		return await ApiClient.{{.Method}}({{.Path}},params) as {{.Response.Expression}}
+        {{- if .Queries}}
+        let params = { {{- range $idx,$val := .Queries -}}{{if gt $idx 0}},{{end}} {{$val.Name}}: {{$val.Alias}}{{- end -}} };
+        {{- else -}}
+        {{- if .Request}}{{else}}let params = {};{{end -}}
+        {{- end}}
+		return await ApiClient.{{.Method}}({{.Path}},{{- if .Request}}body{{else}}params{{end}}) as {{.Response.Expression}}
 	},
 {{end}}

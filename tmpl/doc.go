@@ -20,6 +20,7 @@ type Path struct {
 	Path         string
 	Method       string
 	Parameters   Parameters
+	Queries      Parameters
 	Request      *NamedType
 	Response     *NamedType
 }
