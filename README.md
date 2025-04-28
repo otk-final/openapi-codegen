@@ -4,6 +4,10 @@ This is a tool that generates API call code in various programming languages bas
 
 根据openapi (swagger) 文档生成不同编程语言客户端接口代码
 
+![image](https://github.com/otk-final/openapi-codegen/blob/master/home_api.png)
+
+![image](https://github.com/otk-final/openapi-codegen/blob/master/home_struct.png)
+
 ## Feature
 
 - 支持`v2`/`v3`文档格式
