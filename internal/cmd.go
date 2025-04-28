@@ -15,6 +15,7 @@ import (
 )
 
 type Args struct {
+	Name         string `json:"name"`
 	Endpoint     string `json:"endpoint"`
 	Output       string `json:"output"`
 	ClientOutput string `json:"client_output"`

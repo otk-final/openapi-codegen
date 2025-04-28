@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 )
 
@@ -31,6 +30,10 @@ var initCmd = &cobra.Command{
 	Short: "Initialize environment variable configuration file",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		if initArgs.Name == "" {
+			initArgs.Name = initArgs.Lang
+		}
+
 		//创建openapi.json
 		defaultEnv := &internal.Env{
 			Args:   initArgs,
@@ -53,8 +56,8 @@ var initCmd = &cobra.Command{
 			},
 		}
 		//当前执行目录
-		pwd, _ := os.Executable()
-		envFile := path.Join(filepath.Dir(pwd), defaultEnvFileName)
+		pwd, _ := os.Getwd()
+		envFile := path.Join(pwd, defaultEnvFileName)
 
 		envs := make([]*internal.Env, 0)
 		envs = append(envs, defaultEnv)
