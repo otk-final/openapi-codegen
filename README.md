@@ -71,17 +71,17 @@ openapi init
 ### reload
 
 ```shell
-默认当前目录下 openapi.json
+#默认当前目录下 openapi.json
 openapi reload
 
-自定义文件路径
+#自定义文件路径
 openapi reload -f /app/openapi.json
 ```
 
-根据`openapi.json`配置文件重新生成接口代码，默认生成全部env
+根据`openapi.json`配置文件重新生成接口代码，默认全部
 
 ```shell
-指定env
+#指定env
 openapi reload -f /app/openapi.json -n server_name
 ```
 

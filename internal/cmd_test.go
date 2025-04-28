@@ -5,8 +5,7 @@ import (
 )
 
 var testArgs = &Args{
-	Version: "v3",
-	//Endpoint: "http://175.178.57.240/xhm-api/v3/api-docs/api",
+	Version:  "v3",
 	Endpoint: "http://localhost:8083/v3/api-docs",
 	//Endpoint: "http://localhost:8082/v2/api-docs",
 
