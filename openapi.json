@@ -1,0 +1,158 @@
+[
+  {
+    "endpoint": "http://localhost:8083/v3/api-docs",
+    "output": "/Users/hxy/develops/xhm/sts/sts/demo.swift",
+    "client_output": "/Users/hxy/develops/xhm/sts/sts/client.swift",
+    "lang": "swift",
+    "style": "",
+    "version": "v3",
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "modes": {},
+      "types": {
+        "JsonNode": "[String:String]"
+      },
+      "parameters": {}
+    },
+    "variables": {
+      "apiPackage": "",
+      "clientPackage": "",
+      "structPackage": ""
+    },
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ],
+        "PageData": [
+          "entities+"
+        ],
+        "MapResult": [
+          "data~"
+        ]
+      }
+    }
+  },
+  {
+    "endpoint": "http://175.178.57.240/xhm-api/v3/api-docs/api",
+    "output": "demo/demo.go",
+    "client_output": "demo/client.go",
+    "lang": "go",
+    "style": "",
+    "version": "v3",
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "modes": {},
+      "types": {
+        "JsonNode": "any"
+      },
+      "parameters": {
+        "type": "kind"
+      }
+    },
+    "variables": {
+      "apiPackage": "demo",
+      "clientPackage": "demo",
+      "structPackage": "demo"
+    },
+    "generics": {
+      "enable": true,
+      "unfold": true,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ],
+        "PageData": [
+          "entities+"
+        ],
+        "MapResult": [
+          "data~"
+        ]
+      }
+    }
+  },
+  {
+    "endpoint": "http://localhost:8083/v3/api-docs",
+    "output": "/Users/hxy/develops/openapi/client-ts/src/demo.ts",
+    "client_output": "/Users/hxy/develops/openapi/client-ts/src/client.ts",
+    "lang": "ts",
+    "style": "",
+    "version": "v3",
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "modes": {},
+      "types": {
+        "JsonNode": "any"
+      },
+      "parameters": {}
+    },
+    "variables": {
+      "apiPackage": "",
+      "clientPackage": "",
+      "structPackage": ""
+    },
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ],
+        "PageData": [
+          "entities+"
+        ],
+        "MapResult": [
+          "data~"
+        ]
+      }
+    }
+  },
+  {
+    "endpoint": "http://175.178.57.240/xhm-api/v3/api-docs/api",
+    "output": "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/otk/client_kotlin/api.kt",
+    "client_output": "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/otk/client_kotlin/client.kt",
+    "lang": "kotlin",
+    "style": "",
+    "version": "v3",
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "modes": {},
+      "types": {
+        "JsonNode": "Any"
+      },
+      "parameters": {
+
+      }
+    },
+    "variables": {
+      "apiPackage": "com.otk.client_kotlin",
+      "clientPackage": "com.otk.client_kotlin",
+      "structPackage": "com.otk.client_kotlin"
+    },
+    "generics": {
+      "enable": true,
+      "unfold": true,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ],
+        "PageData": [
+          "entities+"
+        ],
+        "MapResult": [
+          "data~"
+        ]
+      }
+    }
+  }
+]

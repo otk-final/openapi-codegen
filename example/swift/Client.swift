@@ -1,0 +1,64 @@
+
+
+import Alamofire
+import Foundation
+
+/**
+ * TODO You need to implement the current protocol, which can refer to Alamofire or URLSession
+ */
+protocol ApiClient {
+    func get<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
+
+    func post<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
+
+    func put<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
+
+    func delete<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
+}
+
+var BASE_URL = "http://localhost:8083/v3/api-docs"
+
+struct AlamofireApiClient: ApiClient {
+    var headers: HTTPHeaders?
+
+    func get<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
+        let reqParams: Parameters? = params as? [String: Any]
+        return try await AF.request("\(BASE_URL)\(path)",
+                                    method: .get,
+                                    parameters: reqParams,
+                                    encoding: URLEncoding.default,
+                                    headers: headers)
+            .serializingDecodable(resultType.self).value
+    }
+
+    func post<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
+        let reqParams: Parameters? = params as? Dictionary<String, any Sendable>
+        return try await AF.request("\(BASE_URL)\(path)",
+                                    method: .post,
+                                    parameters: reqParams,
+                                    encoding: JSONEncoding.default,
+                                    headers: headers)
+            .serializingDecodable(resultType.self).value
+    }
+
+    func put<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
+        let reqParams: Parameters? = params as? Dictionary<String, any Sendable>
+        return try await AF.request("\(BASE_URL)\(path)",
+                                    method: .put,
+                                    parameters: reqParams,
+                                    encoding: JSONEncoding.default,
+                                    headers: headers)
+            .serializingDecodable(resultType.self).value
+    }
+
+    func delete<T>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T where T: Decodable, T: Encodable {
+        let reqParams: Parameters? = params as? Dictionary<String, any Sendable>
+        return try await AF.request("\(BASE_URL)\(path)",
+                                    method: .delete,
+                                    parameters: reqParams,
+                                    encoding: JSONEncoding.default,
+                                    headers: headers)
+            .serializingDecodable(resultType.self).value
+    }
+}
+
