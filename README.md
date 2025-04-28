@@ -19,8 +19,6 @@ This is a tool that generates API call code in various programming languages bas
 go build -o openapi
 ```
 
-
-
 ## Download 
 
 - windows
@@ -53,11 +51,11 @@ Flags:
 例子
 
 ```shell
-openapi -l ts -o src/api.ts -c src/client.ts  -v v3 -e http://localhost:8081/v3/api_docs
+openapi -l ts -o src/api.ts -c src/client.ts  -v v3 -e http://localhost:8080/v3/api_docs
 ```
 
 ```
-openapi -l kotlin -o src/api.kt -c src/client.kt  -v v2 -e http://localhost:8081/v2/api_docs
+openapi -l kotlin -o src/api.kt -c src/client.kt  -v v2 -e http://localhost:8080/v2/api_docs
 ```
 
 
@@ -85,7 +83,7 @@ openapi -l kotlin -o src/api.kt -c src/client.kt  -v v2 -e http://localhost:8081
 ### Configuration File
 
 ```json
-{
+[{
     //openapi 文档地址
     "endpoint": "http://localhost:8083/v3/api-docs",
     //api文件路径
@@ -157,15 +155,30 @@ openapi -l kotlin -o src/api.kt -c src/client.kt  -v v2 -e http://localhost:8081
         ]
       }
     }
-  }
+  }]
 ```
+
+- 当server端采用统一标准泛型结构返回时，如：`ApiResult<T>`时，可开启`generics.unfold`  参数，业务方法可以直接获取`T`
+- 集合泛型声明：`属性+` ，采用 `+` 符号
+- Map泛型声明：`属性~` ，采用 `~`  符号
+- 内置模版文件：[模版文件](https://github.com/otk-final/openapi-codegen/tree/master/tmpl)
 
 ### Example
 
-#### server
+#### server端
 
-参考
+> [openapi-server](https://github.com/otk-final/openapi-server)
 
-#### client
+#### client端
 
-##### 
+> [ts](https://github.com/otk-final/openapi-codegen/tree/master/example/ts)
+>
+> [go](https://github.com/otk-final/openapi-codegen/tree/master/example/golang)
+>
+> [java](https://github.com/otk-final/openapi-codegen/tree/master/example/java)
+>
+> [kotlin](https://github.com/otk-final/openapi-codegen/tree/master/example/kotlin)
+>
+> [swift](https://github.com/otk-final/openapi-codegen/tree/master/example/swift)
+>
+> [python](https://github.com/otk-final/openapi-codegen/tree/master/example/python)
