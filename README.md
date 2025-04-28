@@ -1,4 +1,4 @@
-# OpenApi 接口代码生成器
+# OpenApi 接口代码生成器 
 
 This is a tool that generates API call code in various programming languages based on the content of an OpenAPI document.
 
@@ -8,7 +8,7 @@ This is a tool that generates API call code in various programming languages bas
 
 - 支持`v2`/`v3`文档格式
 - 支持语言：`ts`，`swift`，`kotlin`，`java`，`python`，`go`
-- 支持泛型
+- **支持泛型**
 - 支持自定义模版
 
 ## Install 
@@ -19,11 +19,11 @@ This is a tool that generates API call code in various programming languages bas
 go build -o openapi
 ```
 
-## Download 
+## Download - 1.0.0
 
-- windows
-- mac
-- linux
+- [mac](https://github.com/otk-final/openapi-codegen/releases/download/1.0.0/openapi_darwin.zip)
+- [windows](https://github.com/otk-final/openapi-codegen/releases/download/1.0.0/openapi_windows.zip)
+- [linux](https://github.com/otk-final/openapi-codegen/releases/download/1.0.0/openapi_linux.zip)
 
 ## Tutorial
 
@@ -158,6 +158,7 @@ openapi -l kotlin -o src/api.kt -c src/client.kt  -v v2 -e http://localhost:8080
   }]
 ```
 
+- openapi文档规范中不支持泛型，泛型表达式需在配置文件中预声明
 - 当server端采用统一标准泛型结构返回时，如：`ApiResult<T>`时，可开启`generics.unfold`  参数，业务方法可以直接获取`T`
 - 集合泛型声明：`属性+` ，采用 `+` 符号
 - Map泛型声明：`属性~` ，采用 `~`  符号
