@@ -77,7 +77,6 @@ func (w *stdWriter) api(output string, name string, engine *template.Template) e
 
 	}
 
-	//不存在则创建目录
 	dir := path.Dir(output)
 	_ = os.MkdirAll(dir, os.ModePerm)
 

@@ -38,7 +38,6 @@ type Parameter struct {
 
 type NamedTypeKind uint
 
-// 类型
 const (
 	ImmutableType NamedTypeKind = 1 << iota
 
@@ -63,7 +62,6 @@ type Parameters = []*Parameter
 func (nt *NamedType) GenerateExpression(format string, convert lang.TypeConvert) {
 	expression := nt.Expression
 
-	//忽略转换
 	if nt.Kind&ImmutableType != 0 {
 		return
 	}
@@ -98,7 +96,7 @@ type Ref struct {
 }
 
 func (r *Ref) ReferenceLevel() int {
-	//根据  ReferenceType 排序
+
 	return lo.Reduce(r.Properties, func(agg int, item *Property, index int) int {
 		if item.Type.Kind&ReferenceType != 0 {
 			return agg + 1

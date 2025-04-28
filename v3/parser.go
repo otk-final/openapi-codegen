@@ -12,7 +12,6 @@ import (
 
 func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 
-	//fetch
 	resp, err := http.Get(addr)
 	if err != nil {
 		return nil, nil, err
@@ -25,7 +24,6 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		_ = resp.Body.Close()
 	}()
 
-	//read
 	body, _ := io.ReadAll(resp.Body)
 	var doc = &Doc{}
 	err = json.Unmarshal(body, doc)
@@ -33,14 +31,12 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		return nil, nil, err
 	}
 
-	//load
 	refs := make([]*tmpl.Ref, 0)
 
 	toPropertyType := func(info Property) *tmpl.NamedType {
 		return schemaType(info.Schema).Parse()
 	}
 
-	//properties
 	toProperties := func(info Mode) tmpl.Properties {
 
 		array := make(tmpl.Properties, 0)
@@ -57,7 +53,6 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		return array
 	}
 
-	//refs
 	schemas := doc.Components.Schemas
 	for name, mode := range schemas {
 
@@ -80,7 +75,6 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 
 			tp := schemaType(item.Schema).Parse()
 
-			// 只支持基础数据类型 FoundationType ArrayType
 			parameters = append(parameters, &tmpl.Parameter{
 				Name:        item.Name,
 				Required:    item.Required,
@@ -94,7 +88,7 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 	}
 
 	toRequest := func(method string, info Method) (nt *tmpl.NamedType) {
-		//包装类型
+
 		schema := info.RequestBody.Content["application/json"].Schema
 		return schemaType(schema).Parse()
 	}
@@ -104,7 +98,6 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		return schemaType(response.Content["*/*"].Schema).Parse()
 	}
 
-	//paths
 	paths := make([]*tmpl.Path, 0)
 	for path, item := range doc.Paths {
 		for method, fn := range item {
@@ -125,12 +118,10 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		}
 	}
 
-	//分组
 	groups := lo.GroupBy(paths, func(item *tmpl.Path) string {
 		return item.Tag
 	})
 
-	//apis
 	apis := make([]*tmpl.Api, 0)
 	for _, tag := range doc.Tags {
 		apis = append(apis, &tmpl.Api{
@@ -155,11 +146,11 @@ func (s schemaType) Parse() *tmpl.NamedType {
 		expression = s.Ref
 	} else {
 		if s.Items != nil {
-			//arr
+
 			expression = cmp.Or(s.Items.Type, s.Items.Ref)
 			kind = lo.Ternary(expression == s.Items.Type, tmpl.ArrayType|tmpl.FoundationType, tmpl.ArrayType|tmpl.ReferenceType)
 		} else if s.AdditionalProperties != nil {
-			//map
+
 			expression = cmp.Or(s.AdditionalProperties.Type, s.AdditionalProperties.Ref)
 			kind = lo.Ternary(expression == s.AdditionalProperties.Type, tmpl.MapType|tmpl.FoundationType, tmpl.MapType|tmpl.ReferenceType)
 		} else {

@@ -10,7 +10,6 @@ type goConvert struct {
 }
 
 func (g *goConvert) Reference(name string) string {
-	//return fmt.Sprintf("*%s", util.CapitalizeFirst(name))
 	return fmt.Sprintf("*%s", name)
 }
 

@@ -75,11 +75,11 @@ func (s schemaType) Parse() *tmpl.NamedType {
 		expression = s.Ref
 	} else {
 		if s.Items != nil {
-			//array
+
 			expression = cmp.Or(s.Items.Type, s.Items.Ref)
 			kind = lo.Ternary(expression == s.Items.Type, tmpl.ArrayType|tmpl.FoundationType, tmpl.ArrayType|tmpl.ReferenceType)
 		} else if s.AdditionalProperties != nil {
-			//map
+
 			expression = cmp.Or(s.AdditionalProperties.Type, s.AdditionalProperties.Ref)
 			kind = lo.Ternary(expression == s.AdditionalProperties.Type, tmpl.MapType|tmpl.FoundationType, tmpl.MapType|tmpl.ReferenceType)
 		} else {

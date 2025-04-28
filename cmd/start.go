@@ -11,7 +11,7 @@ import (
 var startArgs = &internal.Args{}
 
 func init() {
-	//start
+
 	startCmd.Flags().StringVarP(&startArgs.Version, "version", "v", defaultVersion, "openapi version")
 	startCmd.Flags().StringVarP(&startArgs.Endpoint, "endpoint", "e", "", "example：https://{server}:{port}/v3/api-docs")
 	startCmd.Flags().StringVarP(&startArgs.Output, "output", "o", "", "api output file")
@@ -21,12 +21,11 @@ func init() {
 
 }
 
-// run from flag
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Quick start",
 	Run: func(cmd *cobra.Command, args []string) {
-		//默认配置
+
 		env := &internal.Env{
 			Args:   startArgs,
 			Ignore: make([]string, 0),

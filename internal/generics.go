@@ -49,7 +49,6 @@ type nestingGenericManage struct {
 	refs     []*tmpl.Ref
 }
 
-// 递归
 func (n *nestingGenericManage) recursion(current *nestingGeneric, generic, example *tmpl.Ref) {
 
 	//同序 替换占位符
@@ -80,7 +79,6 @@ func (n *nestingGenericManage) recursion(current *nestingGeneric, generic, examp
 			return strings.HasPrefix(nextExpression, item.Name)
 		})
 
-		//参考
 		nextExample, exampleOk := lo.Find(n.refs, func(item *tmpl.Ref) bool {
 			return item.Name == nextExpression
 		})

@@ -53,7 +53,6 @@ type Executor struct {
 
 func New(env *Env, args []string) (*Executor, error) {
 
-	//初始化模版
 	tp, err := tmpl.NewEngine(env.Lang, env.Style)
 	if err != nil {
 		return nil, err
@@ -67,7 +66,6 @@ func New(env *Env, args []string) (*Executor, error) {
 
 func (e *Executor) Run(cmd *Args) error {
 
-	//target language
 	LANG := cmd.Lang
 	typeConvert := lang.NewConvert(LANG, e.env.Alias.Types)
 	e.convert = typeConvert
@@ -76,7 +74,6 @@ func (e *Executor) Run(cmd *Args) error {
 	var outApis []*tmpl.Api
 	var err error
 
-	//加载数据
 	if e.env.Version == "v2" {
 		outRefs, outApis, err = v2.LoadParse(e.env.Endpoint)
 	} else if e.env.Version == "v3" {
@@ -90,7 +87,6 @@ func (e *Executor) Run(cmd *Args) error {
 	}
 
 	// 过滤 path
-	// path 过滤
 	filter := e.env.Filter
 	ignore := e.env.Ignore
 	lo.ForEach(outApis, func(item *tmpl.Api, index int) {
@@ -116,7 +112,6 @@ func (e *Executor) Run(cmd *Args) error {
 		return len(item.Paths) > 0
 	})
 
-	//排序
 	slices.SortFunc(outRefs, func(a, b *tmpl.Ref) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
@@ -128,10 +123,8 @@ func (e *Executor) Run(cmd *Args) error {
 	//是否需要生成泛型
 	if e.env.Generics.Enable {
 
-		// 匹配通用泛型
 		expressions := e.env.Generics.Expressions
 
-		//查找泛型
 		generics := resolvingGenerics(e.convert, expressions, outRefs)
 
 		mgr := &nestingGenericManage{
@@ -142,7 +135,6 @@ func (e *Executor) Run(cmd *Args) error {
 		newRefs := make([]*tmpl.Ref, 0)
 		newRefs = append(newRefs, generics...)
 
-		//修改 ref 所有匹配类型 为 泛型
 		for _, ref := range outRefs {
 
 			refName := ref.Name

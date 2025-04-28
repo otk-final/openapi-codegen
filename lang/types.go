@@ -43,9 +43,6 @@ func init() {
 	handlers["golang"] = &goConvert{}
 	handlers["kotlin"] = &kotlinConvert{}
 	handlers["python"] = &pythonConvert{}
-	//handlers["rust"] = &tsConvert{}
-	//handlers["cpp"] = &tsConvert{}
-	//handlers["c#"] = &tsConvert{}
 }
 
 func Names() []string {
