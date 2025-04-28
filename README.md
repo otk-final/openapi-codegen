@@ -4,13 +4,13 @@ This is a tool that generates API call code in various programming languages bas
 
 根据openapi (swagger) 文档生成不同编程语言客户端接口代码
 
-| Ts     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_ts.png) |
+| Ts     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_ts.jpg) |
 | ------ | ------------------------------------------------------------ |
-| Java   | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_java.png) |
-| Go     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_go.png) |
-| Swift  | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_swift.png) |
-| Python | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_python.png) |
-| Kotlin | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_kotlin.png) |
+| Java   | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_java.jpg) |
+| Go     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_go.jpg) |
+| Swift  | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_swift.jpg) |
+| Python | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_python.jpg) |
+| Kotlin | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_kotlin.jpg) |
 
 ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/home_api.png)
 
