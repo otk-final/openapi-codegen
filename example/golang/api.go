@@ -116,22 +116,22 @@ func (receiver *AnimalControllerMapCats) Call() (map[string]*Cat, error) {
 
 // AnimalControllerMapDog "/animal/map/dogs"
 type AnimalControllerMapDog struct {
-	Client ApiClient[*Dog]
+	Client ApiClient[MapResult[*Dog]]
 }
 
 // Call 响应Map泛型
-func (receiver *AnimalControllerMapDog) Call() (*Dog, error) {
+func (receiver *AnimalControllerMapDog) Call() (MapResult[*Dog], error) {
 	params := map[string]any{}
 	return receiver.Client.Get("/animal/map/dogs", params)
 }
 
 // AnimalControllerPageDogs "/animal/page/dogs"
 type AnimalControllerPageDogs struct {
-	Client ApiClient[*Dog]
+	Client ApiClient[PageData[*Dog]]
 }
 
 // Call 响应Array泛型
-func (receiver *AnimalControllerPageDogs) Call() (*Dog, error) {
+func (receiver *AnimalControllerPageDogs) Call() (PageData[*Dog], error) {
 	params := map[string]any{}
 	return receiver.Client.Get("/animal/page/dogs", params)
 }
@@ -186,44 +186,44 @@ func (receiver *OtherApiMultiplePathVariable) Call(id string, type2 string) ([]*
 
 // UserApiAdd "/user/add"
 type UserApiAdd struct {
-	Client ApiClient[int64]
+	Client ApiClient[ApiResult[int64]]
 }
 
 // Call 添加用户
-func (receiver *UserApiAdd) Call(body *User) (int64, error) {
+func (receiver *UserApiAdd) Call(body *User) (ApiResult[int64], error) {
 
 	return receiver.Client.Post("/user/add", body)
 }
 
 // UserApiDelete fmt.Sprintf("/user/delete/%v",id)
 type UserApiDelete struct {
-	Client ApiClient[bool]
+	Client ApiClient[ApiResult[bool]]
 }
 
 // Call 删除用户
-func (receiver *UserApiDelete) Call(id int64) (bool, error) {
+func (receiver *UserApiDelete) Call(id int64) (ApiResult[bool], error) {
 	params := map[string]any{}
 	return receiver.Client.Delete(fmt.Sprintf("/user/delete/%v", id), params)
 }
 
 // UserApiEdit fmt.Sprintf("/user/edit/%v",id)
 type UserApiEdit struct {
-	Client ApiClient[int64]
+	Client ApiClient[ApiResult[int64]]
 }
 
 // Call 修改用户
-func (receiver *UserApiEdit) Call(id int64, body *User) (int64, error) {
+func (receiver *UserApiEdit) Call(id int64, body *User) (ApiResult[int64], error) {
 
 	return receiver.Client.Put(fmt.Sprintf("/user/edit/%v", id), body)
 }
 
 // UserApiEdit_1 fmt.Sprintf("/user/detail/%v",id)
 type UserApiEdit_1 struct {
-	Client ApiClient[*User]
+	Client ApiClient[ApiResult[*User]]
 }
 
 // Call 查询用户
-func (receiver *UserApiEdit_1) Call(id int64, keyword string) (*User, error) {
+func (receiver *UserApiEdit_1) Call(id int64, keyword string) (ApiResult[*User], error) {
 
 	params := map[string]any{}
 	params["keyword"] = keyword
@@ -233,22 +233,22 @@ func (receiver *UserApiEdit_1) Call(id int64, keyword string) (*User, error) {
 
 // UserApiList "/user/list"
 type UserApiList struct {
-	Client ApiClient[[]*User]
+	Client ApiClient[ApiResult[[]*User]]
 }
 
 // Call 用户列表
-func (receiver *UserApiList) Call() ([]*User, error) {
+func (receiver *UserApiList) Call() (ApiResult[[]*User], error) {
 	params := map[string]any{}
 	return receiver.Client.Get("/user/list", params)
 }
 
 // UserApiPage "/user/page"
 type UserApiPage struct {
-	Client ApiClient[PageData[*User]]
+	Client ApiClient[ApiResult[PageData[*User]]]
 }
 
 // Call 用户分页
-func (receiver *UserApiPage) Call(page int32, size int32) (PageData[*User], error) {
+func (receiver *UserApiPage) Call(page int32, size int32) (ApiResult[PageData[*User]], error) {
 
 	params := map[string]any{}
 	params["page"] = page

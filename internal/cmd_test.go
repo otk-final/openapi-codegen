@@ -18,8 +18,8 @@ var testArgs = &Args{
 	//Output:       "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Api.kt",
 	//ClientOutput: "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Client.kt",
 
-	//Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
-	//ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/demo/client.go",
+	//Output:       "/Users/hxy/develops/openapi/openapi-codegen/example/golang/api.go",
+	//ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/example/golang/client.go",
 
 	Output:       "/Users/hxy/develops/openapi/client-python/demo.py",
 	ClientOutput: "/Users/hxy/develops/openapi/client-python/client.py",
@@ -43,16 +43,16 @@ func TestCmd(t *testing.T) {
 		Alias: Alias{
 			Properties: map[string]string{},
 			Modes:      map[string]string{},
-			Types:      map[string]string{
-				//"JsonNode": "Any",
+			Types: map[string]string{
+				"JsonNode": "any",
 			},
 			Parameters: map[string]string{
-				//"type": "type2",
+				"type": "type2",
 			},
 		},
 		Generics: &Generics{
 			Enable: true,
-			Unfold: true,
+			Unfold: false,
 			Expressions: map[string][]string{
 				"ApiResult": {"data"},
 				"PageData":  {"entities+"},
@@ -60,9 +60,9 @@ func TestCmd(t *testing.T) {
 			},
 		},
 		Variables: map[string]string{
-			"clientPackage": "example",
-			"structPackage": "example.dto",
-			"apiPackage":    "example.api",
+			"clientPackage": "golang",
+			"structPackage": "golang",
+			"apiPackage":    "golang",
 		},
 	}
 	exe, err := New(env, []string{})
