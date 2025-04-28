@@ -20,7 +20,7 @@ This is a tool that generates API call code in various programming languages bas
 
 - 支持`v2`/`v3`文档格式
 - 支持语言：`ts`，`swift`，`kotlin`，`java`，`python`，`go`
-- **支持泛型**
+- ***支持泛型***
 - 支持自定义模版
 
 ## Install 
