@@ -48,19 +48,17 @@ class {{.Name}}:
         """
         {{.Description}}
         """
-        {{if .Parameters -}}
+        {{if .Queries}}
         params = { {{range $idx,$val := .Parameters -}}"{{$val.Name}}": {{$val.Alias}},{{end}} }
-        {{- end -}}
-        return self.client.{{.Method}}({{.Path}}, {{.Response.Expression}}, {{if or .Parameters .Request}}params{{else}}None{{end}})
+        {{- else -}}
+        {{- if .Request}}{{else}}params = {}{{end -}}
+        {{- end}}
+        return self.client.{{.Method}}({{.Path}}, {{.Response.Expression}}, {{- if .Request}}body{{else}}params{{end}})
 {{end}}
 
 
 {{define "parameters"}}
-	{{- if .Parameters -}}
-		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}}:{{$val.Type.Expression}}{{end}}
-	{{- else -}}
-		{{if .Request}}params: {{.Request.Expression}}{{end}}
-	{{- end -}}
+{{- range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}}:{{$val.Type.Expression}}{{end -}}
 {{end}}
 
 

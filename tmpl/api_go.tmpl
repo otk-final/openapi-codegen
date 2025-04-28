@@ -23,22 +23,21 @@ type {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} struct {
 
 // Call {{.Description}}
 func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call({{template "parameters" .}}) ({{.Response.Expression}}, error) {
-    {{if .Parameters -}}
+    {{if .Queries}}
     params := map[string]any{}
-    {{range $idx,$val := .Parameters -}}
+    {{range $idx,$val := .Queries -}}
     params["{{$val.Name}}"] = {{$val.Alias}}
-    {{end}}
-    {{- end -}}
-    return receiver.Client.{{CapitalizeLetter .Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}nil{{end}})
+    {{end -}}
+    {{- else -}}
+    {{if .Request}}{{else}}params := map[string]any{}{{end}}
+    {{- end}}
+    return receiver.Client.{{CapitalizeLetter .Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}})
 }
 {{end}}
 
+
 {{define "parameters"}}
-	{{- if .Parameters -}}
-		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}} {{$val.Type.Expression}}{{end}}
-	{{- else -}}
-		{{if .Request}} params {{.Request.Expression}} {{end}}
-	{{- end -}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}} {{$val.Type.Expression}}{{- end -}}
 {{end}}
 
 {{define "api"}}

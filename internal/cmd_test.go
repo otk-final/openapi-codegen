@@ -13,8 +13,8 @@ var testArgs = &Args{
 	//Output:       "/Users/hxy/develops/openapi/client-ts/src/demo.ts",
 	//ClientOutput: "/Users/hxy/develops/openapi/client-ts/src/client.ts",
 
-	Output:       "/Users/hxy/develops/openapi/client-swift/client-api/Api.swift",
-	ClientOutput: "/Users/hxy/develops/openapi/client-swift/client-api/Client.swift",
+	//Output:       "/Users/hxy/develops/openapi/client-swift/client-api/Api.swift",
+	//ClientOutput: "/Users/hxy/develops/openapi/client-swift/client-api/Client.swift",
 
 	//Output:       "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Api.kt",
 	//ClientOutput: "/Users/hxy/develops/openapi/client-kotlin/app/src/main/java/com/demo/Client.kt",
@@ -22,11 +22,12 @@ var testArgs = &Args{
 	//Output:       "/Users/hxy/develops/openapi/openapi-codegen/demo/api.go",
 	//ClientOutput: "/Users/hxy/develops/openapi/openapi-codegen/demo/client.go",
 
-	//Output:       "/Users/hxy/develops/openapi/client-python/demo.py",
-	//ClientOutput: "/Users/hxy/develops/openapi/client-python/client.py",
+	Output:       "/Users/hxy/develops/openapi/client-python/demo.py",
+	ClientOutput: "/Users/hxy/develops/openapi/client-python/client.py",
 
-	//Output:  "/Users/hxy/develops/openapi/openapi-server/v3/src/main/java/com/demo",
-	Lang: "swift",
+	//Output:       "/Users/hxy/develops/openapi/client-java/src/main/java/example",
+	//ClientOutput: "/Users/hxy/develops/openapi/client-java/src/main/java/example",
+	Lang: "python",
 }
 
 func TestCmd(t *testing.T) {
@@ -43,16 +44,16 @@ func TestCmd(t *testing.T) {
 		Alias: Alias{
 			Properties: map[string]string{},
 			Modes:      map[string]string{},
-			Types: map[string]string{
-				"JsonNode": "any",
+			Types:      map[string]string{
+				//"JsonNode": "Any",
 			},
 			Parameters: map[string]string{
 				//"type": "type2",
 			},
 		},
 		Generics: &Generics{
-			Enable: false,
-			Unfold: false,
+			Enable: true,
+			Unfold: true,
 			Expressions: map[string][]string{
 				"ApiResult": {"data"},
 				"PageData":  {"entities+"},
@@ -60,9 +61,9 @@ func TestCmd(t *testing.T) {
 			},
 		},
 		Variables: map[string]string{
-			"clientPackage": "com.demo",
-			"structPackage": "com.demo",
-			"apiPackage":    "com.demo",
+			"clientPackage": "example",
+			"structPackage": "example.dto",
+			"apiPackage":    "example.api",
 		},
 	}
 	exe, err := New(env, []string{})

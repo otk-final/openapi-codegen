@@ -93,6 +93,7 @@ type Ref struct {
 	Type        *NamedType
 	Properties  Properties
 	Description string
+	Summary     string
 	Ignore      bool
 }
 
@@ -124,6 +125,7 @@ type Property struct {
 	Name        string
 	Alias       string
 	Description string
+	Summary     string
 	Type        *NamedType
 	Format      string
 	Enums       []string

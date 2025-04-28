@@ -37,24 +37,23 @@ data class {{.Type.Expression}} (
 	 * {{.Summary}}
 	 */
     suspend fun {{.Name}}({{template "parameters" .}}):  Result<{{.Response.Expression}}> {
-        {{if .Parameters -}}
-        val params = HashMap<String,Any>();
+        {{- if .Queries}}
+        val params = HashMap<String,Any>()
         {{range $idx,$val := .Parameters -}}
-        params["{{$val.Name}}"] = {{$val.Alias}};
+        params["{{$val.Name}}"] = {{$val.Alias}}
         {{end}}
-        {{- end -}}
-        return client.{{.Method}}({{.Path}},{{.Name}}ResultType, {{if or .Parameters .Request}}params{{else}}{{end}})
+        {{- else -}}
+        {{- if .Request}}{{else}}val params = HashMap<String,Any>(){{end -}}
+        {{- end}}
+        return client.{{.Method}}({{.Path}},{{.Name}}ResultType, {{- if .Request}}body{{else}}params{{end}})
     }
 {{end}}
 
 
 {{define "parameters"}}
-	{{- if .Parameters -}}
-		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}}:{{$val.Type.Expression}}{{end}}
-	{{- else -}}
-		{{if .Request}}params: {{.Request.Expression}}{{end}}
-	{{- end -}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
 {{end}}
+
 
 
 

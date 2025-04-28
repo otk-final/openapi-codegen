@@ -1,24 +1,31 @@
 {{define "structHeader"}}
 package {{Variable .Variables "structPackage"}};
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 {{end}}
 
 {{define "struct"}}
 
+/**
+ * {{.Description}}
+ * {{.Summary}}
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class {{.Type.Expression}} implements Serializable {
-	/**
-	 * {{.Description}}
-	 */
     {{range $val :=.Properties -}}
+    /**
+     * {{.Description}}
+     * {{.Summary}}
+     */
     private {{$val.Type.Expression}} {{$val.Name}};
     {{end}}
 }
@@ -64,27 +71,27 @@ public class {{CapitalizeLetter .Name}} {
 
 	/**
 	 * {{.Description}}
+	 * {{.Summary}}
 	 */
     public {{.Response.Expression}} {{.Name}}({{template "parameters" .}}) {
-        {{if .Parameters -}}
+        {{ if .Queries -}}
         Map<String,Object> params = new HashMap<String,Object>();
         {{range $idx,$val := .Parameters -}}
         params.put("{{$val.Name}}",{{$val.Alias}});
         {{end}}
-        {{- end -}}
-        return client.{{.Method}}({{.Path}}, {{if or .Parameters .Request}}params{{else}}null{{end}}, {{.Name}}ResultType);
+        {{- else -}}
+        {{- if .Request}}{{else}}Map<String,Object> params = new HashMap<String,Object>();{{end -}}
+        {{- end}}
+        return client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}}, {{.Name}}ResultType);
     }
 {{end}}
 
 
-{{define "parameters"}}
-	{{- if .Parameters -}}
-		{{range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Type.Expression}} {{$val.Alias}}{{end}}
-	{{- else -}}
-		{{if .Request}} {{.Request.Expression}} params {{end}}
-	{{- end -}}
-{{end}}
 
+
+{{define "parameters"}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Type.Expression}} {{$val.Alias}}{{- end -}}
+{{end}}
 
 
 {{define "client"}}

@@ -31,7 +31,7 @@ func (j *javaConvert) Foundation(name string, format string) string {
 }
 
 func (j *javaConvert) Map(sub string) string {
-	return fmt.Sprintf("Map<String:%s>", sub)
+	return fmt.Sprintf("Map<String,%s>", sub)
 }
 
 func (j *javaConvert) Array(sub string) string {

@@ -110,13 +110,6 @@ type javaWriter struct {
 
 func (w *javaWriter) api(output string, name string, engine *template.Template) error {
 
-	//创建目录
-	refDir := path.Join(path.Dir(output), "dto")
-	_ = os.MkdirAll(refDir, os.ModePerm)
-
-	apiDir := path.Join(path.Dir(output), "api")
-	_ = os.MkdirAll(apiDir, os.ModePerm)
-
 	// java 一个文件只能有一个struct 需写入多个文件
 	for _, ref := range w.refs {
 
