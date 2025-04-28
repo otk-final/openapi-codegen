@@ -91,7 +91,7 @@ openapi reload -f /app/openapi.json -n server_name
 
 ```json
 [{
-    "name:"server_name"
+    "name:"server_name",
     //openapi 文档地址
     "endpoint": "http://localhost:8083/v3/api-docs",
     //api文件路径
