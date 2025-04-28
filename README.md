@@ -1,8 +1,8 @@
-# OpenApi 接口代码生成器 
+# OpenApi （Swagger）接口代码生成器 
 
 This is a tool that generates API call code in various programming languages based on the content of an OpenAPI document.
 
-根据swagger (openapi) 文档生成客户端接口代码
+根据openapi (swagger) 文档生成不同编程语言客户端接口代码
 
 ## Feature
 
