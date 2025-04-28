@@ -4,13 +4,13 @@ This is a tool that generates API call code in various programming languages bas
 
 根据openapi (swagger) 文档生成不同编程语言客户端接口代码
 
-| Ts     |                                                              |
+| Ts     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_ts.png) |
 | ------ | ------------------------------------------------------------ |
-| Java   | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/home_api.png) |
-| Go     |                                                              |
-| Swift  |                                                              |
-| Python |                                                              |
-| Kotlin |                                                              |
+| Java   | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_java.png) |
+| Go     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_go.png) |
+| Swift  | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_swift.png) |
+| Python | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_python.png) |
+| Kotlin | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_kotlin.png) |
 
 ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/home_api.png)
 
