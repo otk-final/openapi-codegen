@@ -30,7 +30,7 @@ go build -o openapi
 ### start
 
 ```shell
-./openapi start -h
+openapi start -h
 
 Quick start
 
@@ -63,7 +63,7 @@ openapi -l kotlin -o src/api.kt -c src/client.kt  -v v2 -e http://localhost:8080
 ### init
 
 ```shell
-./openapi init
+openapi init
 ```
 
 在当前目录下生成`openapi.json`配置文件
@@ -71,19 +71,27 @@ openapi -l kotlin -o src/api.kt -c src/client.kt  -v v2 -e http://localhost:8080
 ### reload
 
 ```shell
-默认当前路径
-./openapi reload
+默认当前目录下 openapi.json
+openapi reload
 
 自定义文件路径
-./openapi reload -f /app/openapi.json
+openapi reload -f /app/openapi.json
 ```
 
-根据`openapi.json`配置文件重新生成接口代码
+根据`openapi.json`配置文件重新生成接口代码，默认生成全部env
+
+```shell
+指定env
+openapi reload -f /app/openapi.json -n server_name
+```
+
+
 
 ### Configuration File
 
 ```json
 [{
+    "name:"server_name"
     //openapi 文档地址
     "endpoint": "http://localhost:8083/v3/api-docs",
     //api文件路径
