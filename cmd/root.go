@@ -4,8 +4,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const version = "1.0.0"
+
 var rootCmd = &cobra.Command{
 	Use:     "",
+	Version: version,
 	Short:   "openapi codegen tool",
 	Long:    "This is a tool that generates API call code in various programming languages based on the content of an OpenAPI document.",
 	Example: "openapi start -e http://localhost:8080/v3/api-doc -l ts -o src/api.ts",
