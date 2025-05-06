@@ -4,17 +4,17 @@ This is a tool that generates API call code in various programming languages bas
 
 根据openapi (swagger) 文档生成不同编程语言客户端接口代码
 
-| Ts     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_ts.jpg) |
+| Ts     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_ts.jpg) |
 | ------ | ------------------------------------------------------------ |
-| Java   | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_java.jpg) |
-| Go     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_go.jpg) |
-| Swift  | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_swift.jpg) |
-| Python | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_python.jpg) |
-| Kotlin | ![image](https://github.com/otk-final/openapi-codegen/blob/master/images/api_kotlin.jpg) |
+| Java   | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_java.jpg) |
+| Go     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_go.jpg) |
+| Swift  | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_swift.jpg) |
+| Python | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_python.jpg) |
+| Kotlin | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_kotlin.jpg) |
 
-![image](https://github.com/otk-final/openapi-codegen/blob/master/images/home_api.png)
+![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/home_api.png)
 
-![image](https://github.com/otk-final/openapi-codegen/blob/master/images/home_struct.png)
+![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/home_struct.png)
 
 ## Feature
 
@@ -194,14 +194,14 @@ openapi reload -f /app/openapi.json -n server_name
 
 #### client端
 
-> [ts](https://github.com/otk-final/openapi-codegen/tree/master/example/ts)
+> [ts](https://github.com/otk-final/openapi-codegen/tree/master/_example/ts)
 >
-> [go](https://github.com/otk-final/openapi-codegen/tree/master/example/golang)
+> [go](https://github.com/otk-final/openapi-codegen/tree/master/_example/golang)
 >
-> [java](https://github.com/otk-final/openapi-codegen/tree/master/example/java)
+> [java](https://github.com/otk-final/openapi-codegen/tree/master/_example/java)
 >
-> [kotlin](https://github.com/otk-final/openapi-codegen/tree/master/example/kotlin)
+> [kotlin](https://github.com/otk-final/openapi-codegen/tree/master/_example/kotlin)
 >
-> [swift](https://github.com/otk-final/openapi-codegen/tree/master/example/swift)
+> [swift](https://github.com/otk-final/openapi-codegen/tree/master/_example/swift)
 >
-> [python](https://github.com/otk-final/openapi-codegen/tree/master/example/python)
+> [python](https://github.com/otk-final/openapi-codegen/tree/master/_example/python)
