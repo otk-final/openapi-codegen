@@ -81,6 +81,8 @@ func (w *stdWriter) api(output string, name string, engine *template.Template) e
 	dir := path.Dir(output)
 	_ = os.MkdirAll(dir, os.ModePerm)
 
+	fmt.Printf("[output] %s \n", output)
+
 	return os.WriteFile(output, buf.Bytes(), os.ModePerm)
 }
 
@@ -98,6 +100,12 @@ func (w *stdWriter) client(output string, name string, engine *template.Template
 	if err != nil {
 		return err
 	}
+
+	output = tmpl.PwdJoinPath(output)
+	dir := path.Dir(output)
+	_ = os.MkdirAll(dir, os.ModePerm)
+
+	fmt.Printf("[client] %s \n", output)
 
 	return os.WriteFile(output, buf.Bytes(), os.ModePerm)
 }
