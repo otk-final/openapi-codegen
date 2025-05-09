@@ -3,14 +3,22 @@ package cmd
 import (
 	"codegen/internal"
 	"codegen/lang"
+	"codegen/tmpl"
 	"encoding/json"
 	"github.com/spf13/cobra"
 	"os"
-	"path"
 	"strings"
 )
 
-var initArgs = &internal.Args{}
+var initArgs = &internal.Args{
+	Name:         "swagger",
+	Endpoint:     "http://localhost:8080/v3/api-docs",
+	Output:       "src/api.ts",
+	ClientOutput: "src/client.ts",
+	Lang:         "",
+	Style:        "",
+	Version:      "",
+}
 
 func init() {
 	//init
@@ -51,13 +59,15 @@ var initCmd = &cobra.Command{
 				"structPackage": "",
 			},
 			Generics: &internal.Generics{
-				Enable:      false,
-				Expressions: map[string][]string{},
+				Enable: false,
+				Unfold: false,
+				Expressions: map[string][]string{
+					"ApiResult": {"data"},
+				},
 			},
 		}
 		//当前执行目录
-		pwd, _ := os.Getwd()
-		envFile := path.Join(pwd, defaultEnvFileName)
+		envFile := tmpl.PwdJoinPath(defaultEnvFileName)
 
 		envs := make([]*internal.Env, 0)
 		envs = append(envs, defaultEnv)

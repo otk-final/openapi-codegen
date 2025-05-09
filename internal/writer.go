@@ -77,6 +77,7 @@ func (w *stdWriter) api(output string, name string, engine *template.Template) e
 
 	}
 
+	output = tmpl.PwdJoinPath(output)
 	dir := path.Dir(output)
 	_ = os.MkdirAll(dir, os.ModePerm)
 

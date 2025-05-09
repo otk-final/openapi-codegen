@@ -26,11 +26,12 @@ type Args struct {
 
 type Env struct {
 	*Args
-	Ignore    []string          `json:"ignore"`
-	Filter    []string          `json:"filter"`
-	Alias     Alias             `json:"alias"`
-	Variables map[string]string `json:"variables"`
-	Generics  *Generics         `json:"generics"`
+	Ignore                []string          `json:"ignore"`
+	Filter                []string          `json:"filter"`
+	Alias                 Alias             `json:"alias"`
+	Variables             map[string]string `json:"variables"`
+	Generics              *Generics         `json:"generics"`
+	RepeatableOperationId bool              `json:"repeatable_operation_id"`
 }
 
 type Alias struct {
@@ -257,7 +258,6 @@ func (e *Executor) Run(cmd *Args) error {
 				return cmp.Compare(a.Name, b.Name)
 			})
 
-			//统一累计到参数集
 			if path.Request != nil {
 				path.Parameters = append(path.Parameters, &tmpl.Parameter{
 					Name:  "body",
@@ -279,6 +279,16 @@ func (e *Executor) Run(cmd *Args) error {
 			if path.Response != nil {
 				path.Response = findType(path.Response)
 			}
+
+			//方法名 不同Tag下 方法重名下容易生成 add_1,update_39
+			path.Name = lo.TernaryF(e.env.RepeatableOperationId, func() string {
+				return strings.FieldsFunc(path.Name, func(r rune) bool {
+					return r == '_' || r == '-'
+				})[0]
+			}, func() string {
+				return path.Name
+			})
+
 		}
 
 		api.Paths = paths

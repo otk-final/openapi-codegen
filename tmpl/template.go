@@ -3,6 +3,8 @@ package tmpl
 import (
 	_ "embed"
 	"errors"
+	"os"
+	"path/filepath"
 	"text/template"
 )
 
@@ -35,7 +37,7 @@ func NewEngine(lang string, style string) (*template.Template, error) {
 	tp = tp.Funcs(tmplFunc)
 
 	if style != "" {
-		return tp.ParseFiles(style)
+		return tp.ParseFiles(PwdJoinPath(style))
 	}
 
 	switch lang {
@@ -54,4 +56,12 @@ func NewEngine(lang string, style string) (*template.Template, error) {
 	default:
 		return nil, errors.New("invalid language")
 	}
+}
+
+func PwdJoinPath(name string) string {
+	if filepath.IsAbs(name) {
+		return filepath.Clean(name)
+	}
+	pwd, _ := os.Getwd()
+	return filepath.Join(pwd, name)
 }

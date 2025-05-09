@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"codegen/internal"
+	"codegen/tmpl"
 	"encoding/json"
 	"fmt"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"os"
-	"path"
 	"strings"
 )
 
@@ -30,9 +30,9 @@ var reloadCmd = &cobra.Command{
 
 		//当前执行目录
 		if envFile == "" {
-			pwd, _ := os.Getwd()
-			envFile = path.Join(pwd, defaultEnvFileName)
+			envFile = defaultEnvFileName
 		}
+		envFile = tmpl.PwdJoinPath(envFile)
 
 		data, err := os.ReadFile(envFile)
 		if err != nil {
