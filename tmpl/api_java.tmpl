@@ -80,7 +80,7 @@ public class {{CapitalizeLetter .Name}} {
         params.put("{{$val.Name}}",{{$val.Alias}});
         {{end}}
         {{- else -}}
-        {{- if .Request}}{{else}}Map<String,Object> params = new HashMap<String,Object>();{{end -}}
+        {{if .Request}}{{else}}Map<String,Object> params = new HashMap<String,Object>();{{end}}
         {{- end}}
         return client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}}, {{.Name}}ResultType);
     }

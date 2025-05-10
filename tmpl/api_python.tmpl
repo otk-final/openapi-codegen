@@ -51,7 +51,7 @@ class {{.Name}}:
         {{if .Queries}}
         params = { {{range $idx,$val := .Parameters -}}"{{$val.Name}}": {{$val.Alias}},{{end}} }
         {{- else -}}
-        {{- if .Request}}{{else}}params = {}{{end -}}
+        {{if .Request}}{{else}}params = {}{{end}}
         {{- end}}
         return self.client.{{.Method}}({{.Path}}, {{.Response.Expression}}, {{- if .Request}}body{{else}}params{{end}})
 {{end}}

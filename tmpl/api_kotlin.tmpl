@@ -43,7 +43,7 @@ data class {{.Type.Expression}} (
         params["{{$val.Name}}"] = {{$val.Alias}}
         {{end}}
         {{- else -}}
-        {{- if .Request}}{{else}}val params = HashMap<String,Any>(){{end -}}
+        {{if .Request}}{{else}}val params = HashMap<String,Any>(){{end}}
         {{- end}}
         return client.{{.Method}}({{.Path}},{{.Name}}ResultType, {{- if .Request}}body{{else}}params{{end}})
     }

@@ -82,7 +82,7 @@ export const {{.Name}} = {
         {{- if .Queries}}
         let params = { {{- range $idx,$val := .Queries -}}{{if gt $idx 0}},{{end}} {{$val.Name}}: {{$val.Alias}}{{- end -}} };
         {{- else -}}
-        {{- if .Request}}{{else}}let params = {};{{end -}}
+        {{if .Request}}{{else}}let params = {};{{end}}
         {{- end}}
 		return await ApiClient.{{.Method}}({{.Path}},{{- if .Request}}body{{else}}params{{end}}) as {{.Response.Expression}}
 	},
