@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"slices"
 	"text/template"
 )
@@ -78,10 +79,12 @@ func (w *stdWriter) api(output string, name string, engine *template.Template) e
 	}
 
 	output = tmpl.PwdJoinPath(output)
-	dir := path.Dir(output)
-	_ = os.MkdirAll(dir, os.ModePerm)
-
-	fmt.Printf("[output] %s \n", output)
+	dir := filepath.Dir(output)
+	err = os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Output %s \n", output)
 
 	return os.WriteFile(output, buf.Bytes(), os.ModePerm)
 }
@@ -102,10 +105,12 @@ func (w *stdWriter) client(output string, name string, engine *template.Template
 	}
 
 	output = tmpl.PwdJoinPath(output)
-	dir := path.Dir(output)
-	_ = os.MkdirAll(dir, os.ModePerm)
-
-	fmt.Printf("[client] %s \n", output)
+	dir := filepath.Dir(output)
+	err = os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Output %s \n", output)
 
 	return os.WriteFile(output, buf.Bytes(), os.ModePerm)
 }
