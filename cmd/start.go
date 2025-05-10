@@ -8,16 +8,15 @@ import (
 	"strings"
 )
 
-var startArgs = &internal.Args{}
-
 func init() {
 
-	startCmd.Flags().StringVarP(&startArgs.Version, "version", "v", defaultVersion, "openapi version")
-	startCmd.Flags().StringVarP(&startArgs.Endpoint, "endpoint", "e", "", "example：https://{server}:{port}/v3/api-docs")
-	startCmd.Flags().StringVarP(&startArgs.Output, "output", "o", "", "api output file")
-	startCmd.Flags().StringVarP(&startArgs.ClientOutput, "client_output", "c", "", "client output file")
-	startCmd.Flags().StringVarP(&startArgs.Lang, "lang", "l", "", strings.Join(lang.Names(), ","))
-	startCmd.Flags().StringVarP(&startArgs.Style, "style", "s", "", "customize template file")
+	//init
+	startCmd.Flags().StringVarP(&initArgs.Version, "version", "v", initArgs.Version, "openapi version")
+	startCmd.Flags().StringVarP(&initArgs.Endpoint, "endpoint", "e", initArgs.Endpoint, "example：https://{server}:{port}/v3/api-docs")
+	startCmd.Flags().StringVarP(&initArgs.Output, "output", "o", initArgs.Output, "api output file")
+	startCmd.Flags().StringVarP(&initArgs.ClientOutput, "client_output", "c", initArgs.ClientOutput, "client output file")
+	startCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(lang.Names(), ","))
+	startCmd.Flags().StringVarP(&initArgs.Style, "style", "s", initArgs.Style, "customize template file")
 
 }
 
@@ -27,7 +26,7 @@ var startCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		env := &internal.Env{
-			Args:   startArgs,
+			Args:   initArgs,
 			Ignore: make([]string, 0),
 			Filter: make([]string, 0),
 			Alias: internal.Alias{
@@ -39,7 +38,8 @@ var startCmd = &cobra.Command{
 			Variables: map[string]string{},
 			Generics: &internal.Generics{
 				Enable:      false,
-				Expressions: nil,
+				Unfold:      false,
+				Expressions: map[string][]string{},
 			},
 		}
 

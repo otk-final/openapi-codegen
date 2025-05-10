@@ -15,19 +15,18 @@ var initArgs = &internal.Args{
 	Endpoint:     "http://localhost:8080/v3/api-docs",
 	Output:       "src/api.ts",
 	ClientOutput: "src/client.ts",
-	Lang:         "",
-	Style:        "",
-	Version:      "",
+	Lang:         "ts",
+	Version:      defaultVersion,
 }
 
 func init() {
 	//init
-	initCmd.Flags().StringVarP(&initArgs.Version, "version", "v", defaultVersion, "openapi version")
-	initCmd.Flags().StringVarP(&initArgs.Endpoint, "endpoint", "e", "", "example：https://{server}:{port}/v3/api-docs")
-	initCmd.Flags().StringVarP(&startArgs.Output, "output", "o", "", "api output file")
-	initCmd.Flags().StringVarP(&startArgs.ClientOutput, "client_output", "c", "", "client output file")
-	initCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", "", strings.Join(lang.Names(), ","))
-	initCmd.Flags().StringVarP(&initArgs.Style, "style", "s", "", "customize template file")
+	initCmd.Flags().StringVarP(&initArgs.Version, "version", "v", initArgs.Version, "openapi version")
+	initCmd.Flags().StringVarP(&initArgs.Endpoint, "endpoint", "e", initArgs.Endpoint, "example：https://{server}:{port}/v3/api-docs")
+	initCmd.Flags().StringVarP(&initArgs.Output, "output", "o", initArgs.Output, "api output file")
+	initCmd.Flags().StringVarP(&initArgs.ClientOutput, "client_output", "c", initArgs.ClientOutput, "client output file")
+	initCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(lang.Names(), ","))
+	initCmd.Flags().StringVarP(&initArgs.Style, "style", "s", initArgs.Style, "customize template file")
 
 }
 
@@ -37,10 +36,6 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize environment variable configuration file",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		if initArgs.Name == "" {
-			initArgs.Name = initArgs.Lang
-		}
 
 		//创建openapi.json
 		defaultEnv := &internal.Env{
@@ -65,6 +60,7 @@ var initCmd = &cobra.Command{
 					"ApiResult": {"data"},
 				},
 			},
+			RepeatableOperationId: true,
 		}
 		//当前执行目录
 		envFile := tmpl.PwdJoinPath(defaultEnvFileName)
