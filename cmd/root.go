@@ -18,7 +18,7 @@ var defaultVersion = "v3"
 
 func init() {
 	// 根据openapi 生成接口文档
-	rootCmd.AddCommand(startCmd, initCmd, reloadCmd)
+	rootCmd.AddCommand(startCmd, initCmd, reloadCmd, upgradeCmd)
 }
 
 func Run() error {
