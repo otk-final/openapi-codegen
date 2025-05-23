@@ -50,6 +50,10 @@ func Format(lang string, path string, alias map[string]string) string {
 			return "%v"
 		case "swift":
 			return "%@"
+		case "rust":
+			return fmt.Sprintf("${%s}", segment)
+		case "cs":
+			return fmt.Sprintf("{%d}", len(segments)-1)
 		default:
 			return "%s"
 		}
@@ -58,6 +62,10 @@ func Format(lang string, path string, alias map[string]string) string {
 	switch lang {
 	case "ts":
 		return fmt.Sprintf("`%s`", text)
+	case "rust":
+		return fmt.Sprintf(`format!("%s",%s)`, text, strings.Join(segments, ","))
+	case "cs":
+		return fmt.Sprintf(`string.Format("%s",%s)`, text, strings.Join(segments, ","))
 	case "go":
 		return fmt.Sprintf(`fmt.Sprintf("%s",%s)`, text, strings.Join(segments, ","))
 	case "java":

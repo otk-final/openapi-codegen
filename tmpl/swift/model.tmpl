@@ -14,7 +14,7 @@ public struct {{.Type.Expression}}:Codable {
 	{{range $val :=.Properties -}}
 	//{{$val.Description}}
 	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
-	var {{$val.Name}}: {{$val.Type.Expression}}?
+	var {{$val.Alias}}: {{$val.Type.Expression}}?
 	{{end}}
 }
 {{end}}

@@ -2,11 +2,12 @@
 {{- $val}}
 {{end}}
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+use std::collections::HashMap;
+use std::io::Error;
+use std::iter::Map;
+use crate::Client::ApiClient;
+use crate::Model::*;
+
 
 {{range $val :=.Apis}}
 {{template "api" $val}}
@@ -17,13 +18,11 @@ import java.util.HashMap;
 /**
  * {{.Description}}
  */
-public class {{Capitalize .Name}} {
+pub struct {{Capitalize .Name}} {
+    client: dyn ApiClient,
+}
 
-    private final ApiClient client;
-
-    public {{Capitalize .Name}}(ApiClient client) {
-        this.client = client;
-    }
+impl {{Capitalize .Name}} {
 
 	{{range $val :=.Paths -}}
 	{{template "path" $val}}
@@ -34,27 +33,24 @@ public class {{Capitalize .Name}} {
 
 {{define "path"}}
 
-    public static final TypeReference<{{.Response.Expression}}> {{.Name}}ResultType = new TypeReference<{{.Response.Expression}}>() {
-    };
-
 	/**
 	 * {{.Description}}
 	 * {{.Summary}}
 	 */
-    public {{.Response.Expression}} {{.Name}}({{template "parameters" .}}) {
+    async fn {{.Name}}(&self, {{template "parameters" .}}) -> Result<{{.Response.Expression}},Error>  {
         {{ if .Queries -}}
-        Map<String,Object> params = new HashMap<String,Object>();
+        let mut params = HashMap::new();
         {{range $idx,$val := .Parameters -}}
-        params.put("{{$val.Name}}",{{$val.Alias}});
+        params.insert("{{$val.Name}}",{{$val.Alias}}.to_string());
         {{end}}
         {{- else -}}
-        {{if .Request}}{{else}}Map<String,Object> params = new HashMap<String,Object>();{{end}}
+        {{if .Request}}{{else}}let mut params = HashMap::new();{{end}}
         {{- end}}
-        return client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}}, {{.Name}}ResultType);
+        self.client.{{.Method}}(String::from({{.Path}}), {{- if .Request}}body{{else}}params{{end}})
     }
 {{end}}
 
 
 {{define "parameters"}}
-{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Type.Expression}} {{$val.Alias}}{{- end -}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}}{{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
 {{end}}

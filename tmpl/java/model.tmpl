@@ -25,16 +25,16 @@ public class {{.Type.Expression}} implements Serializable {
      * {{.Description}}
      * {{.Summary}}
      */
-    private {{$val.Type.Expression}} {{$val.Name}};
+    private {{$val.Type.Expression}} {{$val.Alias}};
     {{end}}
 
     {{range $val :=.Properties}}
-    public {{$val.Type.Expression}} get{{Capitalize $val.Name}}() {
-        return {{$val.Name}};
+    public {{$val.Type.Expression}} get{{Capitalize $val.Alias}}() {
+        return {{$val.Alias}};
     }
 
-    public void set{{Capitalize $val.Name}}({{$val.Type.Expression}} {{$val.Name}}) {
-        this.{{$val.Name}} = {{$val.Name}};
+    public void set{{Capitalize $val.Name}}({{$val.Type.Expression}} {{$val.Alias}}) {
+        this.{{$val.Alias}} = {{$val.Alias}};
     }
     {{end}}
 }

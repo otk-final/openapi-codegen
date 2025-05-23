@@ -2,11 +2,6 @@
 {{- $val}}
 {{end}}
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 {{range $val :=.Apis}}
 {{template "api" $val}}
@@ -17,11 +12,12 @@ import java.util.HashMap;
 /**
  * {{.Description}}
  */
-public class {{Capitalize .Name}} {
+public class {{Capitalize .Name}}
+{
 
-    private final ApiClient client;
+    private IApiClient client;
 
-    public {{Capitalize .Name}}(ApiClient client) {
+    public {{Capitalize .Name}}(IApiClient client) {
         this.client = client;
     }
 
@@ -33,24 +29,20 @@ public class {{Capitalize .Name}} {
 
 
 {{define "path"}}
-
-    public static final TypeReference<{{.Response.Expression}}> {{.Name}}ResultType = new TypeReference<{{.Response.Expression}}>() {
-    };
-
 	/**
 	 * {{.Description}}
 	 * {{.Summary}}
 	 */
-    public {{.Response.Expression}} {{.Name}}({{template "parameters" .}}) {
+    public Task<{{.Response.Expression}}> {{.Name}}({{template "parameters" .}}) {
         {{ if .Queries -}}
-        Map<String,Object> params = new HashMap<String,Object>();
+        var param = new Dictionary<string,dynamic>();
         {{range $idx,$val := .Parameters -}}
-        params.put("{{$val.Name}}",{{$val.Alias}});
+        param["{{$val.Name}}"] = {{$val.Alias}};
         {{end}}
         {{- else -}}
-        {{if .Request}}{{else}}Map<String,Object> params = new HashMap<String,Object>();{{end}}
+        {{if .Request}}{{else}}var param = new Dictionary<string,dynamic>();{{end}}
         {{- end}}
-        return client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}}, {{.Name}}ResultType);
+        return client.{{Capitalize .Method}}<{{if eq .Method "get"}}{{.Response.Expression}}{{else}},{{end}}>({{.Path}}, {{- if .Request}}body{{else}}param{{end}});
     }
 {{end}}
 

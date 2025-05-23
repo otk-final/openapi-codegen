@@ -10,7 +10,7 @@ export interface {{.Type.Expression}} {
 	{{range $val :=.Properties -}}
 	//{{$val.Description}}
 	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
-	{{$val.Name}}?: {{$val.Type.Expression}}
+	{{$val.Alias}}?: {{$val.Type.Expression}}
 	{{end}}
 }
 {{end}}

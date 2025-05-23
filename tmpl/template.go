@@ -1,7 +1,6 @@
 package tmpl
 
 import (
-	"codegen/tmpl/cpp"
 	"codegen/tmpl/cs"
 	"codegen/tmpl/dart"
 	"codegen/tmpl/golang"
@@ -27,8 +26,7 @@ var register = map[string]map[string]string{
 	"python": python.Templates,
 	"kotlin": kotlin.Templates,
 	"java":   java.Templates,
-	"cs":     cpp.Templates,  //TODO
-	"cpp":    cs.Templates,   //TODO
+	"cs":     cs.Templates,   //TODO
 	"rust":   rust.Templates, //TODO
 	"dart":   dart.Templates, //TODO
 }

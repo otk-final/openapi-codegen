@@ -33,15 +33,13 @@ func (j *Convert) Foundation(name string, format string) string {
 	switch name {
 	case "integer", "number":
 		if format == "int64" {
-			return "Long"
+			return "u64"
 		}
-		return "Integer"
+		return "usize"
 	case "string":
 		return "String"
 	case "boolean":
-		return "Boolean"
-	case "object":
-		return "JsonNode"
+		return "bool"
 	default:
 		return name
 	}
@@ -52,7 +50,7 @@ func (j *Convert) Map(sub string) string {
 }
 
 func (j *Convert) Array(sub string) string {
-	return fmt.Sprintf("List<%s>", sub)
+	return fmt.Sprintf("Vec<%s>", sub)
 }
 
 func (j *Convert) Generic(parentType string, mode lang.GenericMode, subTypes ...string) string {

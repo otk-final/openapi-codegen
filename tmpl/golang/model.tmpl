@@ -11,7 +11,7 @@
 // {{.Name}} {{if .Description}}{{.Description}}{{else}}{{.Type.Expression}}{{end}}
 type {{.Type.Expression}} struct {
 	{{range $val :=.Properties -}}
-	{{Capitalize $val.Name}}  {{$val.Type.Expression}}  `json:"{{$val.Name}},omitempty"` //{{$val.Description}}
+	{{Capitalize $val.Alias}}  {{$val.Type.Expression}}  `json:"{{$val.Name}},omitempty"` //{{$val.Description}}
 	{{end}}
 }
 {{end}}

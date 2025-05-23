@@ -33,22 +33,20 @@ func (j *Convert) Foundation(name string, format string) string {
 	switch name {
 	case "integer", "number":
 		if format == "int64" {
-			return "Long"
+			return "long"
 		}
-		return "Integer"
+		return "int"
 	case "string":
-		return "String"
+		return "string"
 	case "boolean":
-		return "Boolean"
-	case "object":
-		return "JsonNode"
+		return "bool"
 	default:
 		return name
 	}
 }
 
 func (j *Convert) Map(sub string) string {
-	return fmt.Sprintf("Map<String,%s>", sub)
+	return fmt.Sprintf("Dictionary<string,%s>", sub)
 }
 
 func (j *Convert) Array(sub string) string {

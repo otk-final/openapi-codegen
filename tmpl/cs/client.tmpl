@@ -1,115 +1,91 @@
-{{define "structHeader"}}
-package {{Variable .Variables "structPackage"}};
-
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+{{range $val :=.Output.Header}}
+{{- $val}}
 {{end}}
 
-{{define "struct"}}
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Web;
 
-/**
- * {{.Description}}
- * {{.Summary}}
- */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class {{.Type.Expression}} implements Serializable {
-    {{range $val :=.Properties -}}
-    /**
-     * {{.Description}}
-     * {{.Summary}}
-     */
-    private {{$val.Type.Expression}} {{$val.Name}};
-    {{end}}
+public interface IApiClient
+{
+    public Task<T> Get<T>(string path, Dictionary<string, dynamic> parameters) where T : class;
+
+    public Task<T> Post<T, P>(string path, P parameters) where T : class where P : class;
+
+    public Task<T> Put<T, P>(string path, P parameters) where T : class where P : class;
+
+    public Task<T> Delete<T, P>(string path, P parameters) where T : class where P : class;
 }
-{{end}}
 
+public class DefaultApiClient : IApiClient
+{
+    private readonly HttpClient _httpClient;
+    private readonly JsonSerializerOptions _jsonOptions;
 
-{{define "apiHeader"}}
-package {{Variable .Variables "apiPackage"}};
-
-import {{Variable .Variables "structPackage"}}.*;
-import {{Variable .Variables "clientPackage"}}.ApiClient;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-{{end}}
-
-{{define "api"}}
-/**
- * {{.Description}}
- */
-public class {{Capitalize .Name}} {
-
-    private final ApiClient client;
-
-    public {{Capitalize .Name}}(ApiClient client) {
-        this.client = client;
+    public DefaultApiClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
     }
 
-	{{range $val :=.Paths -}}
-	{{template "path" $val}}
-	{{end}}
-}
-{{end}}
+    public async Task<T> Get<T>(string path, Dictionary<string, dynamic> parameters) where T : class
+    {
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress + path);
+        var query = HttpUtility.ParseQueryString(string.Empty);
 
+        foreach (var kvp in parameters)
+        {
+            query[kvp.Key] = kvp.Value.ToString();
+        }
 
-
-{{define "path"}}
-
-    public static final TypeReference<{{.Response.Expression}}> {{.Name}}ResultType = new TypeReference<{{.Response.Expression}}>() {
-    };
-
-	/**
-	 * {{.Description}}
-	 * {{.Summary}}
-	 */
-    public {{.Response.Expression}} {{.Name}}({{template "parameters" .}}) {
-        {{ if .Queries -}}
-        Map<String,Object> params = new HashMap<String,Object>();
-        {{range $idx,$val := .Parameters -}}
-        params.put("{{$val.Name}}",{{$val.Alias}});
-        {{end}}
-        {{- else -}}
-        {{if .Request}}{{else}}Map<String,Object> params = new HashMap<String,Object>();{{end}}
-        {{- end}}
-        return client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}}, {{.Name}}ResultType);
+        uriBuilder.Query = query.ToString();
+        var response = await _httpClient.GetAsync(uriBuilder.ToString());
+        return await DeserializeResponse<T>(response);
     }
-{{end}}
 
+    public async Task<T> Post<T, P>(string path, P parameters) where T : class where P : class
+    {
+        var content = SerializeContent(parameters);
+        var response = await _httpClient.PostAsync(path, content);
+        return await DeserializeResponse<T>(response);
+    }
 
+    public async Task<T> Put<T, P>(string path, P parameters) where T : class where P : class
+    {
+        var content = SerializeContent(parameters);
+        var response = await _httpClient.PutAsync(path, content);
+        return await DeserializeResponse<T>(response);
+    }
 
+    public async Task<T> Delete<T, P>(string path, P parameters) where T : class where P : class
+    {
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri(_httpClient.BaseAddress + path),
+            Content = SerializeContent(parameters)
+        };
+        var response = await _httpClient.SendAsync(request);
+        return await DeserializeResponse<T>(response);
+    }
 
-{{define "parameters"}}
-{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Type.Expression}} {{$val.Alias}}{{- end -}}
-{{end}}
+    private HttpContent SerializeContent<T>(T obj)
+    {
+        var json = JsonSerializer.Serialize(obj, _jsonOptions);
+        return new StringContent(json, Encoding.UTF8, "application/json");
+    }
 
-
-{{define "client"}}
-
-package {{Variable .Variables "clientPackage"}};
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import java.util.Map;
-
-public interface ApiClient  {
-
-    <T> T get(String path, Map<String, Object> params, TypeReference<T> resultType);
-
-    <P, T> T put(String path, P body, TypeReference<T> resultType);
-
-    <P, T> T post(String path, P params, TypeReference<T> resultType);
-
-    <P, T> T delete(String path, P params, TypeReference<T> resultType);
+    private async Task<T> DeserializeResponse<T>(HttpResponseMessage response) where T : class
+    {
+        response.EnsureSuccessStatusCode();
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+    }
 }
-{{end}}

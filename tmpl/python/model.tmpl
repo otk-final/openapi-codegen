@@ -25,6 +25,6 @@ class {{.Type.Expression}}:
     {{.Name}} {{.Description}}
     """
 	{{range $val :=.Properties -}}
-	{{$val.Name}}: {{$val.Type.Expression}} = None
+	{{$val.Alias}}: {{$val.Type.Expression}} = None
 	{{end}}
 {{end}}

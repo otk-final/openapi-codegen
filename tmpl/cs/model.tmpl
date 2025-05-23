@@ -2,12 +2,6 @@
 {{- $val}}
 {{end}}
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
 {{range $val :=.Models}}
 {{template "model" $val}}
 {{end}}
@@ -19,23 +13,14 @@ import java.util.Map;
  * {{.Description}}
  * {{.Summary}}
  */
-public class {{.Type.Expression}} implements Serializable {
+public class {{.Type.Expression}}
+{
     {{range $val :=.Properties -}}
     /**
      * {{.Description}}
      * {{.Summary}}
      */
-    private {{$val.Type.Expression}} {{$val.Name}};
-    {{end}}
-
-    {{range $val :=.Properties}}
-    public {{$val.Type.Expression}} get{{Capitalize $val.Name}}() {
-        return {{$val.Name}};
-    }
-
-    public void set{{Capitalize $val.Name}}({{$val.Type.Expression}} {{$val.Name}}) {
-        this.{{$val.Name}} = {{$val.Name}};
-    }
+    public {{$val.Type.Expression}}? {{Capitalize $val.Alias}} { get; set; }
     {{end}}
 }
 {{end}}
