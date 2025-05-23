@@ -1,6 +1,7 @@
 package tmpl
 
 import (
+	"codegen/lang"
 	"github.com/samber/lo"
 )
 
@@ -65,7 +66,7 @@ type NamedType struct {
 
 type Parameters = []*Parameter
 
-func (nt *NamedType) GenerateExpression(format string, convert TypeConvert) {
+func (nt *NamedType) GenerateExpression(format string, convert lang.TypeConvert) {
 	expression := nt.Expression
 
 	if nt.Kind&ImmutableType != 0 {
@@ -74,7 +75,7 @@ func (nt *NamedType) GenerateExpression(format string, convert TypeConvert) {
 	nt.Expression = nt.Kind.Parse(expression, format, convert)
 }
 
-func (nk NamedTypeKind) Parse(expression string, format string, convert TypeConvert) string {
+func (nk NamedTypeKind) Parse(expression string, format string, convert lang.TypeConvert) string {
 
 	if nk&FoundationType != 0 {
 		expression = convert.Foundation(expression, format)

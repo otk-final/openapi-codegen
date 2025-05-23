@@ -2,6 +2,7 @@ package internal
 
 import (
 	"cmp"
+	"codegen/lang"
 	"codegen/tmpl"
 	v2 "codegen/v2"
 	v3 "codegen/v3"
@@ -45,13 +46,13 @@ type Generics struct {
 
 type Executor struct {
 	env     *Env
-	convert tmpl.TypeConvert
+	convert lang.TypeConvert
 }
 
 func New(env *Env, args []string) (*Executor, error) {
 	return &Executor{
 		env:     env,
-		convert: tmpl.NewConvert(env.Lang, env.Alias.Types),
+		convert: tmpl.NewLangConvert(env.Lang, env.Alias.Types),
 	}, nil
 }
 
@@ -267,7 +268,7 @@ func (e *Executor) buildApis(outRefs []*tmpl.Ref, outApis []*tmpl.Api) ([]*tmpl.
 		})
 
 		if len(parameters) > 0 {
-			return tmpl.Format(LANG, path.OriginalPath, e.env.Alias.Parameters)
+			return lang.Format(LANG, path.OriginalPath, e.env.Alias.Parameters)
 		}
 		return fmt.Sprintf(`"%s"`, path.Path)
 	}

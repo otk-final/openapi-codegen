@@ -1,7 +1,7 @@
 package ts
 
 import (
-	"codegen/tmpl"
+	"codegen/lang"
 	_ "embed"
 	"fmt"
 	"strings"
@@ -48,6 +48,6 @@ func (t *Convert) Map(sub string) string {
 	return fmt.Sprintf("Record<string,%s>", sub)
 }
 
-func (t *Convert) Generic(parentType string, mode tmpl.GenericMode, subTypes ...string) string {
+func (t *Convert) Generic(parentType string, mode lang.GenericMode, subTypes ...string) string {
 	return fmt.Sprintf("%s<%s>", parentType, strings.Join(subTypes, ","))
 }

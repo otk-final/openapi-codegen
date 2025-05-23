@@ -1,7 +1,7 @@
 package cs
 
 import (
-	"codegen/tmpl"
+	"codegen/lang"
 	_ "embed"
 	"fmt"
 	"strings"
@@ -55,6 +55,6 @@ func (j *Convert) Array(sub string) string {
 	return fmt.Sprintf("List<%s>", sub)
 }
 
-func (j *Convert) Generic(parentType string, mode tmpl.GenericMode, subTypes ...string) string {
+func (j *Convert) Generic(parentType string, mode lang.GenericMode, subTypes ...string) string {
 	return fmt.Sprintf("%s<%s>", parentType, strings.Join(subTypes, ","))
 }

@@ -13,7 +13,7 @@ func init() {
 	//init
 	startCmd.Flags().StringVarP(&initArgs.Version, "version", "v", initArgs.Version, "openapi version")
 	startCmd.Flags().StringVarP(&initArgs.Endpoint, "endpoint", "e", initArgs.Endpoint, "example：https://{server}:{port}/v3/api-docs")
-	startCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(tmpl.Names(), ","))
+	startCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(tmpl.LangNames(), ","))
 }
 
 var startCmd = &cobra.Command{

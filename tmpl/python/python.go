@@ -1,7 +1,7 @@
 package python
 
 import (
-	"codegen/tmpl"
+	"codegen/lang"
 	_ "embed"
 	"fmt"
 	"strings"
@@ -52,8 +52,8 @@ func (p *Convert) Array(sub string) string {
 	return fmt.Sprintf("List[%s]", sub)
 }
 
-func (p *Convert) Generic(parentType string, mode tmpl.GenericMode, subTypes ...string) string {
-	if mode == tmpl.TypeGenericMode {
+func (p *Convert) Generic(parentType string, mode lang.GenericMode, subTypes ...string) string {
+	if mode == lang.TypeGenericMode {
 		return fmt.Sprintf("%s(Generic[%s])", parentType, strings.Join(subTypes, ", "))
 	}
 	return fmt.Sprintf("%s[%s]", parentType, strings.Join(subTypes, ", "))

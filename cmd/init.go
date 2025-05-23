@@ -20,7 +20,7 @@ func init() {
 	//init
 	initCmd.Flags().StringVarP(&initArgs.Version, "version", "v", initArgs.Version, "openapi version")
 	initCmd.Flags().StringVarP(&initArgs.Endpoint, "endpoint", "e", initArgs.Endpoint, "example：https://{server}:{port}/v3/api-docs")
-	initCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(tmpl.Names(), ","))
+	initCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(tmpl.LangNames(), ","))
 }
 
 // create env file

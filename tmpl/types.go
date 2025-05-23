@@ -2,6 +2,7 @@ package tmpl
 
 import (
 	"cmp"
+	"codegen/lang"
 	"codegen/tmpl/cs"
 	"codegen/tmpl/dart"
 	"codegen/tmpl/golang"
@@ -16,31 +17,7 @@ import (
 	"strings"
 )
 
-type GenericMode int
-
-const (
-	// ActualGenericMode 实参类型
-	ActualGenericMode GenericMode = iota + 1
-
-	// TypeGenericMode 行参类型
-	TypeGenericMode
-)
-
-type TypeConvert interface {
-
-	// Reference 引用类型
-	Reference(name string) string
-	// Foundation 基础类型
-	Foundation(name string, format string) string
-	// Array 数组
-	Array(sub string) string
-	// Map 字典
-	Map(sub string) string
-	// Generic 泛型
-	Generic(parentType string, mode GenericMode, subTypes ...string) string
-}
-
-var handlers = map[string]TypeConvert{}
+var handlers = map[string]lang.TypeConvert{}
 
 func init() {
 	handlers["ts"] = &ts.Convert{}
@@ -53,11 +30,11 @@ func init() {
 	handlers["dart"] = &dart.Convert{}
 }
 
-func Names() []string {
+func LangNames() []string {
 	return lo.Keys(handlers)
 }
 
-func NewConvert(targetLang string, extendTypes map[string]string) TypeConvert {
+func NewLangConvert(targetLang string, extendTypes map[string]string) lang.TypeConvert {
 	return &extendConverts{
 		handler: handlers,
 		mapping: extendTypes,
@@ -66,7 +43,7 @@ func NewConvert(targetLang string, extendTypes map[string]string) TypeConvert {
 }
 
 type extendConverts struct {
-	handler map[string]TypeConvert
+	handler map[string]lang.TypeConvert
 	mapping map[string]string
 	target  string
 }
@@ -104,7 +81,7 @@ func (l *extendConverts) Map(sub string) string {
 	return l.handler[l.target].Map(sub)
 }
 
-func (l *extendConverts) Generic(parentType string, mode GenericMode, subTypes ...string) string {
+func (l *extendConverts) Generic(parentType string, mode lang.GenericMode, subTypes ...string) string {
 	return l.handler[l.target].Generic(parentType, mode, subTypes...)
 }
 

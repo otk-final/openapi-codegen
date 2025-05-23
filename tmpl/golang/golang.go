@@ -1,7 +1,7 @@
 package golang
 
 import (
-	"codegen/tmpl"
+	"codegen/lang"
 	_ "embed"
 	"fmt"
 	"github.com/samber/lo"
@@ -54,8 +54,8 @@ func (g *Convert) Array(sub string) string {
 	return fmt.Sprintf("[]%s", sub)
 }
 
-func (g *Convert) Generic(parentType string, mode tmpl.GenericMode, subTypes ...string) string {
-	if mode == tmpl.TypeGenericMode {
+func (g *Convert) Generic(parentType string, mode lang.GenericMode, subTypes ...string) string {
+	if mode == lang.TypeGenericMode {
 		subTypes = lo.Map(subTypes, func(item string, index int) string {
 			return fmt.Sprintf("%s any", item)
 		})

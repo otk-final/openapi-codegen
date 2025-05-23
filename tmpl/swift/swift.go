@@ -1,7 +1,7 @@
 package swift
 
 import (
-	"codegen/tmpl"
+	"codegen/lang"
 	_ "embed"
 	"fmt"
 	"github.com/samber/lo"
@@ -54,8 +54,8 @@ func (s *Convert) Map(sub string) string {
 	return fmt.Sprintf("[String:%s]", sub)
 }
 
-func (s *Convert) Generic(parentType string, mode tmpl.GenericMode, subTypes ...string) string {
-	if mode == tmpl.TypeGenericMode {
+func (s *Convert) Generic(parentType string, mode lang.GenericMode, subTypes ...string) string {
+	if mode == lang.TypeGenericMode {
 		subTypes = lo.Map(subTypes, func(item string, index int) string {
 			return fmt.Sprintf("%s: Codable", item)
 		})
