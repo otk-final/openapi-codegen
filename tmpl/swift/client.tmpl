@@ -18,7 +18,7 @@ protocol ApiClient {
     func delete<T: Codable>(_ path: String, _ params: Any?, _ resultType: T.Type) async throws -> T
 }
 
-var BASE_URL = "{{.Endpoint}}"
+var BASE_URL = "{{.Env.Endpoint}}"
 
 struct AlamofireApiClient: ApiClient {
     var headers: HTTPHeaders?

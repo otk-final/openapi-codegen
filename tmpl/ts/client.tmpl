@@ -5,7 +5,7 @@
 import axios, {AxiosError, AxiosResponse} from "axios";
 
 export const axiosClient = axios.create({
-    baseURL: "{{.Endpoint}}",
+    baseURL: "{{.Env.Endpoint}}",
     headers: {
         'Content-Type': 'application/json;charset=utf-8'
     },

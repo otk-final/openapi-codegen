@@ -1,102 +1,6 @@
-{{define "structHeader"}}
-package {{Variable .Variables "structPackage"}};
-
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+{{range $val :=.Output.Header}}
+{{- $val}}
 {{end}}
-
-{{define "struct"}}
-
-/**
- * {{.Description}}
- * {{.Summary}}
- */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class {{.Type.Expression}} implements Serializable {
-    {{range $val :=.Properties -}}
-    /**
-     * {{.Description}}
-     * {{.Summary}}
-     */
-    private {{$val.Type.Expression}} {{$val.Name}};
-    {{end}}
-}
-{{end}}
-
-
-{{define "apiHeader"}}
-package {{Variable .Variables "apiPackage"}};
-
-import {{Variable .Variables "structPackage"}}.*;
-import {{Variable .Variables "clientPackage"}}.ApiClient;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-{{end}}
-
-{{define "api"}}
-/**
- * {{.Description}}
- */
-public class {{Capitalize .Name}} {
-
-    private final ApiClient client;
-
-    public {{Capitalize .Name}}(ApiClient client) {
-        this.client = client;
-    }
-
-	{{range $val :=.Paths -}}
-	{{template "path" $val}}
-	{{end}}
-}
-{{end}}
-
-
-
-{{define "path"}}
-
-    public static final TypeReference<{{.Response.Expression}}> {{.Name}}ResultType = new TypeReference<{{.Response.Expression}}>() {
-    };
-
-	/**
-	 * {{.Description}}
-	 * {{.Summary}}
-	 */
-    public {{.Response.Expression}} {{.Name}}({{template "parameters" .}}) {
-        {{ if .Queries -}}
-        Map<String,Object> params = new HashMap<String,Object>();
-        {{range $idx,$val := .Parameters -}}
-        params.put("{{$val.Name}}",{{$val.Alias}});
-        {{end}}
-        {{- else -}}
-        {{if .Request}}{{else}}Map<String,Object> params = new HashMap<String,Object>();{{end}}
-        {{- end}}
-        return client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}}, {{.Name}}ResultType);
-    }
-{{end}}
-
-
-
-
-{{define "parameters"}}
-{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Type.Expression}} {{$val.Alias}}{{- end -}}
-{{end}}
-
-
-{{define "client"}}
-
-package {{Variable .Variables "clientPackage"}};
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -112,4 +16,3 @@ public interface ApiClient  {
 
     <P, T> T delete(String path, P params, TypeReference<T> resultType);
 }
-{{end}}

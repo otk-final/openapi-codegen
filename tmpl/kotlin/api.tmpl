@@ -18,7 +18,7 @@ import com.google.gson.reflect.TypeToken
 	 * {{.Summary}}
 	 */
     suspend fun {{.Name}}({{template "parameters" .}}):  Result<{{.Response.Expression}}> {
-        {{- if .Queries}}
+        {{if .Queries}}
         val params = HashMap<String,Any>()
         {{range $idx,$val := .Parameters -}}
         params["{{$val.Name}}"] = {{$val.Alias}}

@@ -54,7 +54,7 @@ class ApiClient {
 
 var defaultGson = Gson()
 private var defaultClient =
-    Retrofit.Builder().baseUrl("{{.Endpoint}}").build().create(RetrofitClient::class.java)
+    Retrofit.Builder().baseUrl("{{.Env.Endpoint}}").build().create(RetrofitClient::class.java)
 
 interface RetrofitClient {
 

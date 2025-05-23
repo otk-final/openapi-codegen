@@ -2,6 +2,13 @@
 {{- $val}}
 {{end}}
 
+import {ApiClient} from './client';
+import {
+    {{range $val :=.Models}}
+    {{- $val.Alias}},
+    {{end}}
+} from './model';
+
 
 {{range $val :=.Apis}}
 {{template "api" $val}}
@@ -31,7 +38,7 @@ export const {{.Name}} = {
 	 * {{.Description}}
 	 */
 	{{.Name}}: async ({{template "parameters" .}}) => {
-        {{- if .Queries}}
+        {{if .Queries}}
         let params = { {{- range $idx,$val := .Queries -}}{{if gt $idx 0}},{{end}} {{$val.Name}}: {{$val.Alias}}{{- end -}} };
         {{- else -}}
         {{if .Request}}{{else}}let params = {};{{end}}

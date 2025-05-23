@@ -1,12 +1,14 @@
 package tmpl
 
 import (
+	"codegen/tmpl/cpp"
 	"codegen/tmpl/cs"
 	"codegen/tmpl/dart"
 	"codegen/tmpl/golang"
 	"codegen/tmpl/java"
 	"codegen/tmpl/kotlin"
 	"codegen/tmpl/python"
+	"codegen/tmpl/rust"
 	"codegen/tmpl/swift"
 	"codegen/tmpl/ts"
 	_ "embed"
@@ -25,8 +27,10 @@ var register = map[string]map[string]string{
 	"python": python.Templates,
 	"kotlin": kotlin.Templates,
 	"java":   java.Templates,
-	"c#":     cs.Templates,
-	"dart":   dart.Templates,
+	"cs":     cpp.Templates,  //TODO
+	"cpp":    cs.Templates,   //TODO
+	"rust":   rust.Templates, //TODO
+	"dart":   dart.Templates, //TODO
 }
 
 func Capitalize(s string) string {
@@ -73,21 +77,34 @@ func PwdJoinPath(name string) string {
 	return filepath.Join(pwd, name)
 }
 
+var langFileSuffix = map[string]string{
+	"python": "py",
+	"golang": "go",
+	"kotlin": "kt",
+	"rust":   "rs",
+}
+
 func NewOutputs(lang string) map[string]*Output {
+
+	suffix, ok := langFileSuffix[lang]
+	if !ok {
+		suffix = lang
+	}
+
 	return map[string]*Output{
 		"api": {
 			Header:    []string{},
-			File:      fmt.Sprintf("api.%s", lang),
+			File:      fmt.Sprintf("api.%s", suffix),
 			Variables: map[string]string{},
 		},
 		"model": {
 			Header:    []string{},
-			File:      fmt.Sprintf("model.%s", lang),
+			File:      fmt.Sprintf("model.%s", suffix),
 			Variables: map[string]string{},
 		},
 		"client": {
 			Header:    []string{},
-			File:      fmt.Sprintf("client.%s", lang),
+			File:      fmt.Sprintf("client.%s", suffix),
 			Variables: map[string]string{},
 		},
 	}

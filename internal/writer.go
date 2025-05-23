@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"codegen/tmpl"
 	"fmt"
+	"github.com/samber/lo"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -33,6 +35,17 @@ type stdWriter struct {
 func (w *stdWriter) write(output *tmpl.Output, apis []*tmpl.Api, models []*tmpl.Ref, engine *template.Template) error {
 	buf := &bytes.Buffer{}
 
+	if w.name == "model" {
+
+		models = lo.Filter(models, func(item *tmpl.Ref, index int) bool {
+			return !item.Ignore
+		})
+
+		if len(models) == 0 {
+			return nil
+		}
+	}
+
 	data := struct {
 		Output *tmpl.Output
 		Env    *Env
@@ -51,7 +64,16 @@ func (w *stdWriter) write(output *tmpl.Output, apis []*tmpl.Api, models []*tmpl.
 		return err
 	}
 
-	file := tmpl.PwdJoinPath(output.File)
+	//格式化路径参数
+	textFile := output.File
+	if len(apis) == 1 {
+		textFile = strings.ReplaceAll(textFile, "{api}", apis[0].Name)
+	}
+	if len(models) == 1 {
+		textFile = strings.ReplaceAll(textFile, "{model}", models[0].Name)
+	}
+
+	file := tmpl.PwdJoinPath(textFile)
 	dir := filepath.Dir(file)
 	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {

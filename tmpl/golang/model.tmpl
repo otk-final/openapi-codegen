@@ -2,8 +2,6 @@
 {{- $val}}
 {{end}}
 
-import "fmt"
-
 {{range $val :=.Models}}
 {{template "model" $val}}
 {{end}}

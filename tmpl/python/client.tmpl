@@ -24,7 +24,7 @@ class ApiClient:
 
 
 class HttClient(ApiClient):
-    BASE_URL = "{{.Endpoint}}"
+    BASE_URL = "{{.Env.Endpoint}}"
 
     def get(self, path: str, mode: Type[T], params: P = None) -> Optional[T]:
         url = f"{self.BASE_URL}{path}"
