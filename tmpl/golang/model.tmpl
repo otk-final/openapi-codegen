@@ -1,0 +1,19 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+import "fmt"
+
+{{range $val :=.Models}}
+{{template "model" $val}}
+{{end}}
+
+
+{{define "model"}}
+// {{.Name}} {{if .Description}}{{.Description}}{{else}}{{.Type.Expression}}{{end}}
+type {{.Type.Expression}} struct {
+	{{range $val :=.Properties -}}
+	{{Capitalize $val.Name}}  {{$val.Type.Expression}}  `json:"{{$val.Name}},omitempty"` //{{$val.Description}}
+	{{end}}
+}
+{{end}}

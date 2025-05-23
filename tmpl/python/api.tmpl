@@ -1,0 +1,57 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+
+from dataclasses import dataclass
+from typing import Generic, TypeVar, Optional, Any, Type, List, Dict
+
+from client import ApiClient
+
+T = TypeVar('T')
+A = TypeVar('A')
+B = TypeVar('B')
+C = TypeVar('C')
+P = TypeVar('P')
+
+
+{{range $val :=.Apis}}
+{{template "api" $val}}
+{{end}}
+
+
+{{define "api"}}
+class {{.Name}}:
+    """
+    {{.Description}}
+    """
+    client: ApiClient = None
+
+    def __init__(self, client: ApiClient):
+        self.client = client
+
+    {{range $val :=.Paths -}}
+    {{template "path" $val}}
+    {{end}}
+
+{{end}}
+
+
+{{define "path"}}
+
+    def {{.Name}}(self, {{template "parameters" .}}) -> Optional[{{.Response.Expression}}]:
+        """
+        {{.Description}}
+        """
+        {{if .Queries}}
+        params = { {{range $idx,$val := .Parameters -}}"{{$val.Name}}": {{$val.Alias}},{{end}} }
+        {{- else -}}
+        {{if .Request}}{{else}}params = {}{{end}}
+        {{- end}}
+        return self.client.{{.Method}}({{.Path}}, {{.Response.Expression}}, {{- if .Request}}body{{else}}params{{end}})
+{{end}}
+
+
+{{define "parameters"}}
+{{- range $idx,$val := .Parameters -}} {{if gt $idx 0}}, {{end}}{{$val.Alias}}:{{$val.Type.Expression}}{{end -}}
+{{end}}

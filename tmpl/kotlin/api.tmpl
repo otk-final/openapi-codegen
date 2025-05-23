@@ -1,0 +1,48 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+import java.io.Serializable
+import com.google.gson.reflect.TypeToken
+
+{{range $val :=.Apis}}
+{{template "api" $val}}
+{{end}}
+
+{{define "path"}}
+
+
+    var {{.Name}}ResultType = object : TypeToken<{{.Response.Expression}}>() {}.type
+	/**
+	 * {{.Description}}
+	 * {{.Summary}}
+	 */
+    suspend fun {{.Name}}({{template "parameters" .}}):  Result<{{.Response.Expression}}> {
+        {{- if .Queries}}
+        val params = HashMap<String,Any>()
+        {{range $idx,$val := .Parameters -}}
+        params["{{$val.Name}}"] = {{$val.Alias}}
+        {{end}}
+        {{- else -}}
+        {{if .Request}}{{else}}val params = HashMap<String,Any>(){{end}}
+        {{- end}}
+        return client.{{.Method}}({{.Path}},{{.Name}}ResultType, {{- if .Request}}body{{else}}params{{end}})
+    }
+{{end}}
+
+
+{{define "parameters"}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
+{{end}}
+
+
+{{define "api"}}
+/**
+ * {{.Description}}
+ */
+class {{.Name}}(private var client: ApiClient) {
+	{{range $val :=.Paths -}}
+	{{template "path" $val}}
+	{{end}}
+}
+{{end}}

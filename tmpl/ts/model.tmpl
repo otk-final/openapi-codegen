@@ -1,0 +1,22 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+{{define "model"}}
+/**
+ * {{.Description}}
+ */
+export interface {{.Type.Expression}} {
+	{{range $val :=.Properties -}}
+	//{{$val.Description}}
+	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
+	{{$val.Name}}?: {{$val.Type.Expression}}
+	{{end}}
+}
+{{end}}
+
+
+{{range $val :=.Models}}
+{{template "model" $val}}
+{{end}}
+

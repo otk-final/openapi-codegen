@@ -1,7 +1,15 @@
-package lang
+package tmpl
 
 import (
 	"cmp"
+	"codegen/tmpl/cs"
+	"codegen/tmpl/dart"
+	"codegen/tmpl/golang"
+	"codegen/tmpl/java"
+	"codegen/tmpl/kotlin"
+	"codegen/tmpl/python"
+	"codegen/tmpl/swift"
+	"codegen/tmpl/ts"
 	"fmt"
 	"github.com/samber/lo"
 	"regexp"
@@ -35,12 +43,14 @@ type TypeConvert interface {
 var handlers = map[string]TypeConvert{}
 
 func init() {
-	handlers["ts"] = &tsConvert{}
-	handlers["swift"] = &swiftConvert{}
-	handlers["java"] = &javaConvert{}
-	handlers["go"] = &goConvert{}
-	handlers["kotlin"] = &kotlinConvert{}
-	handlers["python"] = &pythonConvert{}
+	handlers["ts"] = &ts.Convert{}
+	handlers["swift"] = &swift.Convert{}
+	handlers["java"] = &java.Convert{}
+	handlers["go"] = &golang.Convert{}
+	handlers["kotlin"] = &kotlin.Convert{}
+	handlers["python"] = &python.Convert{}
+	handlers["c#"] = &cs.Convert{}
+	handlers["dart"] = &dart.Convert{}
 }
 
 func Names() []string {

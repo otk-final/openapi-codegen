@@ -1,54 +1,6 @@
-{{define "header"}}
-package {{Variable .Variables "apiPackage"}};
-
-import "fmt"
+{{range $val :=.Output.Header}}
+{{- $val}}
 {{end}}
-
-{{define "struct"}}
-// {{.Name}} {{if .Description}}{{.Description}}{{else}}{{.Type.Expression}}{{end}}
-type {{.Type.Expression}} struct {
-	{{range $val :=.Properties -}}
-	{{CapitalizeLetter $val.Name}}  {{$val.Type.Expression}}  `json:"{{$val.Name}},omitempty"` //{{$val.Description}}
-	{{end}}
-}
-{{end}}
-
-
-{{define "path"}}
-
-// {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} {{.Path}}
-type {{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}} struct {
-    Client ApiClient[{{.Response.Expression}}]
-}
-
-// Call {{.Description}}
-func (receiver *{{CapitalizeLetter .Tag}}{{CapitalizeLetter .Name}}) Call({{template "parameters" .}}) ({{.Response.Expression}}, error) {
-    {{if .Queries}}
-    params := map[string]any{}
-    {{range $idx,$val := .Queries -}}
-    params["{{$val.Name}}"] = {{$val.Alias}}
-    {{end -}}
-    {{- else -}}
-    {{if .Request}}{{else}}params := map[string]any{}{{end}}
-    {{- end}}
-    return receiver.Client.{{CapitalizeLetter .Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}})
-}
-{{end}}
-
-
-{{define "parameters"}}
-{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}} {{$val.Type.Expression}}{{- end -}}
-{{end}}
-
-{{define "api"}}
-    	{{range $val :=.Paths -}}
-    	{{template "path" $val}}
-    	{{end}}
-{{end}}
-
-
-{{define "client"}}
-package {{Variable .Variables "clientPackage"}}
 
 import (
 	"bytes"
@@ -157,4 +109,3 @@ func (t *DefaultClient[T]) request(req *http.Request) (T, error) {
 	}
 	return ret, nil
 }
-{{end}}

@@ -1,0 +1,30 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+
+from dataclasses import dataclass
+from typing import Generic, TypeVar, Optional, Any, Type, List, Dict
+
+from client import ApiClient
+
+T = TypeVar('T')
+A = TypeVar('A')
+B = TypeVar('B')
+C = TypeVar('C')
+P = TypeVar('P')
+
+{{range $val :=.Models}}
+{{template "model" $val}}
+{{end}}
+
+{{define "model"}}
+@dataclass
+class {{.Type.Expression}}:
+    """
+    {{.Name}} {{.Description}}
+    """
+	{{range $val :=.Properties -}}
+	{{$val.Name}}: {{$val.Type.Expression}} = None
+	{{end}}
+{{end}}

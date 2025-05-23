@@ -2,7 +2,6 @@ package internal
 
 import (
 	"cmp"
-	"codegen/lang"
 	"codegen/tmpl"
 	"fmt"
 	"github.com/samber/lo"
@@ -17,7 +16,7 @@ type nestingGeneric struct {
 	Subs       []*nestingGeneric
 }
 
-func (n *nestingGeneric) discriminator(convert lang.TypeConvert) string {
+func (n *nestingGeneric) discriminator(convert tmpl.TypeConvert) string {
 	lines := make([]string, 0)
 	for _, sub := range n.Subs {
 		var expression = sub.Expression
@@ -33,7 +32,7 @@ func (n *nestingGeneric) discriminator(convert lang.TypeConvert) string {
 		return n.Kind.Parse(n.Expression, n.Format, convert)
 	}
 
-	return convert.Generic(n.Expression, lang.ActualGenericMode, lines...)
+	return convert.Generic(n.Expression, tmpl.ActualGenericMode, lines...)
 }
 
 func (n *nestingGeneric) unfold() {
@@ -119,7 +118,7 @@ func (n *nestingGenericManage) recursion(current *nestingGeneric, generic, examp
 var placeholders = []string{"T", "A", "B", "C", "D", "E", "F", "G", "H"}
 
 // 匹配泛型
-func resolvingGenerics(convert lang.TypeConvert, expressions map[string][]string, refs []*tmpl.Ref) []*tmpl.Ref {
+func resolvingGenerics(convert tmpl.TypeConvert, expressions map[string][]string, refs []*tmpl.Ref) []*tmpl.Ref {
 
 	var defines = make([]*tmpl.Ref, 0)
 	for wrapper, discriminators := range expressions {
@@ -175,7 +174,7 @@ func resolvingGenerics(convert lang.TypeConvert, expressions map[string][]string
 		placeholders := placeholders[:idx]
 		tp := &tmpl.NamedType{
 			Kind:       tmpl.ImmutableType, //类型设置不可变
-			Expression: convert.Generic(wrapper, lang.TypeGenericMode, placeholders...),
+			Expression: convert.Generic(wrapper, tmpl.TypeGenericMode, placeholders...),
 		}
 
 		ref := &tmpl.Ref{

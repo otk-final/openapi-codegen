@@ -1,0 +1,50 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+{{range $val :=.Apis}}
+{{template "api" $val}}
+{{end}}
+
+
+
+{{define "parameters"}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
+{{end}}
+
+{{define "path"}}
+	/**
+	 * {{.Description}}
+	 */
+    func {{.Name}}({{template "parameters" .}}) async throws -> {{.Response.Expression}} {
+        {{if .Queries}}
+        var params: [String: Any?] = [:]
+        {{range $idx,$val := .Queries -}}
+        params["{{$val.Name}}"] = {{$val.Alias}}
+        {{end -}}
+        {{- else -}}
+        {{if .Request}}{{else}}var params: [String: Any?] = [:]{{end}}
+        {{- end}}
+        return try await client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}} ,{{.Response.Expression}}.self)
+    }
+{{end}}
+
+{{define "api"}}
+/**
+ * {{.Description}}
+ */
+class {{.Name}} {
+
+    var client: ApiClient
+
+    init(client: ApiClient) {
+        self.client = client
+    }
+
+	{{range $val :=.Paths -}}
+	{{template "path" $val}}
+	{{end}}
+}
+{{end}}
+
+

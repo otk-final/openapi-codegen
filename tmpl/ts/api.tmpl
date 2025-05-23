@@ -1,0 +1,41 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+
+{{range $val :=.Apis}}
+{{template "api" $val}}
+{{end}}
+
+
+{{define "api"}}
+/**
+ * {{.Description}}
+ */
+export const {{.Name}} = {
+	{{range $val :=.Paths -}}
+	{{template "path" $val}}
+	{{end}}
+}
+{{end}}
+
+
+{{define "parameters"}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
+{{end}}
+
+
+{{define "path"}}
+	/**
+	 * {{.Summary}}
+	 * {{.Description}}
+	 */
+	{{.Name}}: async ({{template "parameters" .}}) => {
+        {{- if .Queries}}
+        let params = { {{- range $idx,$val := .Queries -}}{{if gt $idx 0}},{{end}} {{$val.Name}}: {{$val.Alias}}{{- end -}} };
+        {{- else -}}
+        {{if .Request}}{{else}}let params = {};{{end}}
+        {{- end}}
+		return await ApiClient.{{.Method}}({{.Path}},{{- if .Request}}body{{else}}params{{end}}) as {{.Response.Expression}}
+	},
+{{end}}

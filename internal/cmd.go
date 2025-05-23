@@ -2,7 +2,6 @@ package internal
 
 import (
 	"cmp"
-	"codegen/lang"
 	"codegen/tmpl"
 	v2 "codegen/v2"
 	v3 "codegen/v3"
@@ -11,27 +10,24 @@ import (
 	"github.com/samber/lo"
 	"slices"
 	"strings"
-	"text/template"
 )
 
 type Args struct {
-	Name         string `json:"name"`
-	Endpoint     string `json:"endpoint"`
-	Output       string `json:"output"`
-	ClientOutput string `json:"client_output"`
-	Lang         string `json:"lang"`
-	Style        string `json:"style"`
-	Version      string `json:"version"`
+	Name     string `json:"name"`
+	Endpoint string `json:"endpoint"`
+	Lang     string `json:"lang"`
+	Version  string `json:"version"`
 }
 
 type Env struct {
 	*Args
-	Ignore                []string          `json:"ignore"`
-	Filter                []string          `json:"filter"`
-	Alias                 Alias             `json:"alias"`
-	Variables             map[string]string `json:"variables"`
-	Generics              *Generics         `json:"generics"`
-	RepeatableOperationId bool              `json:"repeatable_operation_id"`
+	Output                map[string]*tmpl.Output `json:"output"`
+	Ignore                []string                `json:"ignore"`
+	Filter                []string                `json:"filter"`
+	Alias                 Alias                   `json:"alias"`
+	Variables             map[string]string       `json:"variables"`
+	Generics              *Generics               `json:"generics"`
+	RepeatableOperationId bool                    `json:"repeatable_operation_id"`
 }
 
 type Alias struct {
@@ -49,28 +45,17 @@ type Generics struct {
 
 type Executor struct {
 	env     *Env
-	convert lang.TypeConvert
-	engine  *template.Template
+	convert tmpl.TypeConvert
 }
 
 func New(env *Env, args []string) (*Executor, error) {
-
-	tp, err := tmpl.NewEngine(env.Lang, env.Style)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Executor{
-		env:    env,
-		engine: tp,
+		env:     env,
+		convert: tmpl.NewConvert(env.Lang, env.Alias.Types),
 	}, nil
 }
 
 func (e *Executor) Run(cmd *Args) error {
-
-	LANG := cmd.Lang
-	typeConvert := lang.NewConvert(LANG, e.env.Alias.Types)
-	e.convert = typeConvert
 
 	var outRefs []*tmpl.Ref
 	var outApis []*tmpl.Api
@@ -83,36 +68,11 @@ func (e *Executor) Run(cmd *Args) error {
 	} else {
 		return errors.New("invalid version")
 	}
-
 	if err != nil {
 		return err
 	}
 
-	// 过滤 path
-	filter := e.env.Filter
-	ignore := e.env.Ignore
-	lo.ForEach(outApis, func(item *tmpl.Api, index int) {
-		item.Paths = lo.Filter(item.Paths, func(p *tmpl.Path, index int) bool {
-			path := p.Path
-			_, ignoreMatch := lo.Find(ignore, func(p string) bool {
-				return strings.HasPrefix(path, p)
-			})
-			if ignoreMatch {
-				return false
-			}
-
-			if len(filter) > 0 {
-				_, filterMatch := lo.Find(filter, func(p string) bool {
-					return strings.HasPrefix(path, p)
-				})
-				return filterMatch
-			}
-			return true
-		})
-	})
-	outApis = lo.Filter(outApis, func(item *tmpl.Api, index int) bool {
-		return len(item.Paths) > 0
-	})
+	outApis = e.filterApis(outApis)
 
 	slices.SortFunc(outRefs, func(a, b *tmpl.Ref) int {
 		return cmp.Compare(a.Name, b.Name)
@@ -121,6 +81,43 @@ func (e *Executor) Run(cmd *Args) error {
 	slices.SortFunc(outApis, func(a, b *tmpl.Api) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
+
+	outRefs, err = e.buildRefs(outRefs)
+	if err != nil {
+		return err
+	}
+
+	outApis, err = e.buildApis(outRefs, outApis)
+	if err != nil {
+		return err
+	}
+
+	for name, output := range e.env.Output {
+
+		//合并 Variables
+		for k, v := range e.env.Variables {
+			if _, ok := output.Variables[k]; ok {
+				continue
+			}
+			output.Variables[k] = v
+		}
+
+		writer := newWriter(name, e.env)
+		engine, err := tmpl.NewEngine(e.env.Lang, name, output.Template, output.Variables)
+		if err != nil {
+			return err
+		}
+
+		err = writer.write(output, outApis, outRefs, engine)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e *Executor) buildRefs(outRefs []*tmpl.Ref) ([]*tmpl.Ref, error) {
+	typeConvert := e.convert
 
 	//是否需要生成泛型
 	if e.env.Generics.Enable {
@@ -201,6 +198,48 @@ func (e *Executor) Run(cmd *Args) error {
 		ref.Alias = cmp.Or(e.env.Alias.Modes[ref.Name], ref.Name)
 	}
 
+	//有顺序要求，重新排序
+	slices.SortFunc(outRefs, func(a, b *tmpl.Ref) int {
+		return a.ReferenceLevel() - b.ReferenceLevel()
+	})
+
+	return outRefs, nil
+}
+
+func (e *Executor) filterApis(outApis []*tmpl.Api) []*tmpl.Api {
+	// 过滤 path
+	filter := e.env.Filter
+	ignore := e.env.Ignore
+	lo.ForEach(outApis, func(item *tmpl.Api, index int) {
+		item.Paths = lo.Filter(item.Paths, func(p *tmpl.Path, index int) bool {
+			path := p.Path
+			_, ignoreMatch := lo.Find(ignore, func(p string) bool {
+				return strings.HasPrefix(path, p)
+			})
+			if ignoreMatch {
+				return false
+			}
+
+			if len(filter) > 0 {
+				_, filterMatch := lo.Find(filter, func(p string) bool {
+					return strings.HasPrefix(path, p)
+				})
+				return filterMatch
+			}
+			return true
+		})
+	})
+
+	return lo.Filter(outApis, func(item *tmpl.Api, index int) bool {
+		return len(item.Paths) > 0
+	})
+}
+
+func (e *Executor) buildApis(outRefs []*tmpl.Ref, outApis []*tmpl.Api) ([]*tmpl.Api, error) {
+
+	LANG := e.env.Lang
+	typeConvert := e.convert
+
 	//查询
 	findType := func(currenType *tmpl.NamedType) *tmpl.NamedType {
 
@@ -228,7 +267,7 @@ func (e *Executor) Run(cmd *Args) error {
 		})
 
 		if len(parameters) > 0 {
-			return lang.Format(LANG, path.OriginalPath, e.env.Alias.Parameters)
+			return tmpl.Format(LANG, path.OriginalPath, e.env.Alias.Parameters)
 		}
 		return fmt.Sprintf(`"%s"`, path.Path)
 	}
@@ -294,16 +333,5 @@ func (e *Executor) Run(cmd *Args) error {
 		api.Paths = paths
 	}
 
-	//写入接口文件
-	w := newWriter(e.env, outRefs, outApis)
-
-	//写入接口
-	err = w.api(e.env.Output, "header", e.engine)
-	if err != nil {
-		return err
-	}
-
-	//写入接口适配
-	err = w.client(e.env.ClientOutput, "client", e.engine)
-	return err
+	return outApis, nil
 }

@@ -1,7 +1,6 @@
 package tmpl
 
 import (
-	"codegen/lang"
 	"github.com/samber/lo"
 )
 
@@ -23,6 +22,13 @@ type Path struct {
 	Queries      Parameters
 	Request      *NamedType
 	Response     *NamedType
+}
+
+type Output struct {
+	Header    []string          `json:"header,omitempty"`    //文件头信息
+	File      string            `json:"file,omitempty"`      //文件地址
+	Template  string            `json:"template,omitempty"`  //模版文件
+	Variables map[string]string `json:"variables,omitempty"` //变量集
 }
 
 type Parameter struct {
@@ -59,7 +65,7 @@ type NamedType struct {
 
 type Parameters = []*Parameter
 
-func (nt *NamedType) GenerateExpression(format string, convert lang.TypeConvert) {
+func (nt *NamedType) GenerateExpression(format string, convert TypeConvert) {
 	expression := nt.Expression
 
 	if nt.Kind&ImmutableType != 0 {
@@ -68,7 +74,7 @@ func (nt *NamedType) GenerateExpression(format string, convert lang.TypeConvert)
 	nt.Expression = nt.Kind.Parse(expression, format, convert)
 }
 
-func (nk NamedTypeKind) Parse(expression string, format string, convert lang.TypeConvert) string {
+func (nk NamedTypeKind) Parse(expression string, format string, convert TypeConvert) string {
 
 	if nk&FoundationType != 0 {
 		expression = convert.Foundation(expression, format)

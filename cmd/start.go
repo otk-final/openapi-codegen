@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"codegen/internal"
-	"codegen/lang"
+	"codegen/tmpl"
 	"fmt"
 	"github.com/spf13/cobra"
 	"strings"
@@ -13,11 +13,7 @@ func init() {
 	//init
 	startCmd.Flags().StringVarP(&initArgs.Version, "version", "v", initArgs.Version, "openapi version")
 	startCmd.Flags().StringVarP(&initArgs.Endpoint, "endpoint", "e", initArgs.Endpoint, "example：https://{server}:{port}/v3/api-docs")
-	startCmd.Flags().StringVarP(&initArgs.Output, "output", "o", initArgs.Output, "api output file")
-	startCmd.Flags().StringVarP(&initArgs.ClientOutput, "client_output", "c", initArgs.ClientOutput, "client output file")
-	startCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(lang.Names(), ","))
-	startCmd.Flags().StringVarP(&initArgs.Style, "style", "s", initArgs.Style, "customize template file")
-
+	startCmd.Flags().StringVarP(&initArgs.Lang, "lang", "l", initArgs.Lang, strings.Join(tmpl.Names(), ","))
 }
 
 var startCmd = &cobra.Command{
@@ -29,6 +25,7 @@ var startCmd = &cobra.Command{
 			Args:   initArgs,
 			Ignore: make([]string, 0),
 			Filter: make([]string, 0),
+			Output: tmpl.NewOutputs(initArgs.Lang),
 			Alias: internal.Alias{
 				Properties: make(map[string]string),
 				Modes:      make(map[string]string),

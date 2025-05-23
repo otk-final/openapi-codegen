@@ -1,61 +1,68 @@
 package tmpl
 
 import (
+	"codegen/tmpl/cs"
+	"codegen/tmpl/dart"
+	"codegen/tmpl/golang"
+	"codegen/tmpl/java"
+	"codegen/tmpl/kotlin"
+	"codegen/tmpl/python"
+	"codegen/tmpl/swift"
+	"codegen/tmpl/ts"
 	_ "embed"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
+	"unicode"
 )
 
-//go:embed api_ts.tmpl
-var ts string
-
-//go:embed api_go.tmpl
-var golang string
-
-//go:embed api_kotlin.tmpl
-var kotlin string
-
-//go:embed api_swift.tmpl
-var swift string
-
-//go:embed api_python.tmpl
-var python string
-
-//go:embed api_java.tmpl
-var java string
-
-var tmplFunc = template.FuncMap{
-	"CapitalizeLetter": CapitalizeFirst,
-	"Variable":         Variable,
+var register = map[string]map[string]string{
+	"ts":     ts.Templates,
+	"go":     golang.Templates,
+	"swift":  swift.Templates,
+	"python": python.Templates,
+	"kotlin": kotlin.Templates,
+	"java":   java.Templates,
+	"c#":     cs.Templates,
+	"dart":   dart.Templates,
 }
 
-func NewEngine(lang string, style string) (*template.Template, error) {
+func Capitalize(s string) string {
+	if s == "" {
+		return ""
+	}
+	runes := []rune(s)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
+}
+
+func NewEngine(lang string, name string, style string, variable map[string]string) (*template.Template, error) {
 	tp := template.New(lang)
 
-	tp = tp.Funcs(tmplFunc)
+	var tmplFunc = template.FuncMap{
+		"Capitalize": Capitalize,
+		"Variable": func(key string) string {
+			return variable[key]
+		},
+	}
+	tp.Funcs(tmplFunc)
 
+	//自定义模版
 	if style != "" {
 		return tp.ParseFiles(PwdJoinPath(style))
 	}
 
-	switch lang {
-	case "ts":
-		return tp.Parse(ts)
-	case "go":
-		return tp.Parse(golang)
-	case "java":
-		return tp.Parse(java)
-	case "kotlin":
-		return tp.Parse(kotlin)
-	case "swift":
-		return tp.Parse(swift)
-	case "python":
-		return tp.Parse(python)
-	default:
+	mapping, ok := register[lang]
+	if !ok {
 		return nil, errors.New("invalid language")
 	}
+	define, ok := mapping[name]
+	if !ok {
+		return nil, errors.New("invalid language template name")
+	}
+	return tp.Parse(define)
 }
 
 func PwdJoinPath(name string) string {
@@ -64,4 +71,24 @@ func PwdJoinPath(name string) string {
 	}
 	pwd, _ := os.Getwd()
 	return filepath.Join(pwd, name)
+}
+
+func NewOutputs(lang string) map[string]*Output {
+	return map[string]*Output{
+		"api": {
+			Header:    []string{},
+			File:      fmt.Sprintf("api.%s", lang),
+			Variables: map[string]string{},
+		},
+		"model": {
+			Header:    []string{},
+			File:      fmt.Sprintf("model.%s", lang),
+			Variables: map[string]string{},
+		},
+		"client": {
+			Header:    []string{},
+			File:      fmt.Sprintf("client.%s", lang),
+			Variables: map[string]string{},
+		},
+	}
 }

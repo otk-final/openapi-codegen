@@ -1,0 +1,20 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+{{range $val :=.Models}}
+{{template "model" $val}}
+{{end}}
+
+{{define "model"}}
+/**
+ * {{.Description}}
+ */
+public struct {{.Type.Expression}}:Codable {
+	{{range $val :=.Properties -}}
+	//{{$val.Description}}
+	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
+	var {{$val.Name}}: {{$val.Type.Expression}}?
+	{{end}}
+}
+{{end}}

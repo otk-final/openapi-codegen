@@ -1,0 +1,24 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+import java.io.Serializable
+import com.google.gson.reflect.TypeToken
+
+{{range $val :=.Models}}
+{{template "model" $val}}
+{{end}}
+
+
+{{define "model"}}
+/**
+ * {{.Description}}
+ */
+data class {{.Type.Expression}} (
+	{{range $val :=.Properties -}}
+	//{{$val.Description}}
+	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
+	var {{$val.Name}}: {{$val.Type.Expression}},
+	{{end}}
+) : Serializable
+{{end}}

@@ -5,190 +5,87 @@ import (
 	"codegen/tmpl"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
-	"slices"
 	"text/template"
 )
 
 type writer interface {
-	api(output string, name string, engine *template.Template) error
-	client(output string, name string, engine *template.Template) error
+	write(output *tmpl.Output, apis []*tmpl.Api, models []*tmpl.Ref, engine *template.Template) error
 }
 
-func newWriter(env *Env, refs []*tmpl.Ref, apis []*tmpl.Api) writer {
+func newWriter(name string, env *Env) writer {
 
 	//标准输入
-	std := &stdWriter{env, refs, apis}
+	std := &stdWriter{name, env}
 
-	switch env.Lang {
-	case "java":
-		return &javaWriter{env, refs, apis}
-	case "python":
-		return &pythonWriter{std}
-	default:
-		return std
+	//java 需要输出多个文件
+	if env.Lang == "java" {
+		return &javaWriter{name, env, std}
 	}
+	return std
 }
 
 type stdWriter struct {
+	name string
 	env  *Env
-	refs []*tmpl.Ref
-	apis []*tmpl.Api
 }
 
-func (w *stdWriter) api(output string, name string, engine *template.Template) error {
+func (w *stdWriter) write(output *tmpl.Output, apis []*tmpl.Api, models []*tmpl.Ref, engine *template.Template) error {
 	buf := &bytes.Buffer{}
+
+	data := struct {
+		Output *tmpl.Output
+		Env    *Env
+		Apis   []*tmpl.Api
+		Models []*tmpl.Ref
+	}{
+		Output: output,
+		Apis:   apis,
+		Models: models,
+		Env:    w.env,
+	}
 
 	//写入 header
-	err := engine.ExecuteTemplate(buf, name, w.env)
+	err := engine.Execute(buf, data)
 	if err != nil {
 		return err
 	}
 
-	// 写入 struct
-	for _, ref := range w.refs {
-
-		if ref.Ignore {
-			continue
-		}
-
-		fmt.Printf("[struct] %s - %s \n", ref.Name, ref.Description)
-
-		err = engine.ExecuteTemplate(buf, "struct", ref)
-		if err != nil {
-			fmt.Printf("error %s", err.Error())
-			continue
-		}
-	}
-
-	// 写入 api
-	for _, api := range w.apis {
-		fmt.Printf("[api] %s - %s \n", api.Name, api.Description)
-
-		err = engine.ExecuteTemplate(buf, "api", api)
-		if err != nil {
-			fmt.Printf("error %s", err.Error())
-			continue
-		}
-
-		for _, p := range api.Paths {
-			fmt.Printf(" ├─[%s] %s - %s \n", p.Method, p.OriginalPath, p.Summary)
-		}
-
-	}
-
-	output = tmpl.PwdJoinPath(output)
-	dir := filepath.Dir(output)
+	file := tmpl.PwdJoinPath(output.File)
+	dir := filepath.Dir(file)
 	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Output %s \n", output)
+	fmt.Printf("Output %s \n", file)
 
-	return os.WriteFile(output, buf.Bytes(), os.ModePerm)
-}
-
-func (w *stdWriter) client(output string, name string, engine *template.Template) error {
-	if output == "" {
-		return nil
-	}
-
-	if n := engine.Lookup(name); n == nil {
-		return nil
-	}
-
-	buf := &bytes.Buffer{}
-	err := engine.ExecuteTemplate(buf, name, w.env)
-	if err != nil {
-		return err
-	}
-
-	output = tmpl.PwdJoinPath(output)
-	dir := filepath.Dir(output)
-	err = os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Output %s \n", output)
-
-	return os.WriteFile(output, buf.Bytes(), os.ModePerm)
+	return os.WriteFile(file, buf.Bytes(), os.ModePerm)
 }
 
 type javaWriter struct {
+	name string
 	env  *Env
-	refs []*tmpl.Ref
-	apis []*tmpl.Api
+	std  writer
 }
 
-func (w *javaWriter) api(output string, name string, engine *template.Template) error {
-
-	// java 一个文件只能有一个struct 需写入多个文件
-	for _, ref := range w.refs {
-
-		if ref.Ignore {
-			continue
+// java 一个文件只能有一个model 或者 api 需写入多个文件
+func (w *javaWriter) write(output *tmpl.Output, apis []*tmpl.Api, models []*tmpl.Ref, engine *template.Template) error {
+	if w.name == "api" {
+		for _, api := range apis {
+			err := w.std.write(output, []*tmpl.Api{api}, models, engine)
+			if err != nil {
+				return err
+			}
 		}
-
-		fileWriter := &stdWriter{
-			env:  w.env,
-			refs: []*tmpl.Ref{ref},
-			apis: make([]*tmpl.Api, 0),
+		return nil
+	} else if w.name == "model" {
+		for _, model := range models {
+			err := w.std.write(output, apis, []*tmpl.Ref{model}, engine)
+			if err != nil {
+				return err
+			}
 		}
-
-		structFile := path.Join(output, "dto", fmt.Sprintf("%s.java", ref.Name))
-		err := fileWriter.api(structFile, "structHeader", engine)
-		if err != nil {
-			return err
-		}
+		return nil
 	}
-
-	for _, api := range w.apis {
-
-		fileWriter := &stdWriter{
-			env:  w.env,
-			refs: []*tmpl.Ref{},
-			apis: []*tmpl.Api{api},
-		}
-
-		apiFile := path.Join(output, "api", fmt.Sprintf("%s.java", api.Name))
-		err := fileWriter.api(apiFile, "apiHeader", engine)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (w *javaWriter) client(output string, name string, engine *template.Template) error {
-
-	fileWriter := &stdWriter{
-		env:  w.env,
-		refs: []*tmpl.Ref{},
-		apis: []*tmpl.Api{},
-	}
-
-	//接口
-	clientFile := path.Join(output, "ApiClient.java")
-	_ = fileWriter.client(clientFile, "client", engine)
-
-	return nil
-}
-
-type pythonWriter struct {
-	*stdWriter
-}
-
-func (w *pythonWriter) api(output string, name string, engine *template.Template) error {
-	// python 有顺序要求，重新排序
-	slices.SortFunc(w.refs, func(a, b *tmpl.Ref) int {
-		return a.ReferenceLevel() - b.ReferenceLevel()
-	})
-
-	return w.stdWriter.api(output, name, engine)
-}
-
-func (w *pythonWriter) client(output string, name string, engine *template.Template) error {
-	return w.stdWriter.client(output, name, engine)
+	return w.std.write(output, apis, models, engine)
 }

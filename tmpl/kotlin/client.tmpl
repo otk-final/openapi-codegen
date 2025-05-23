@@ -1,77 +1,6 @@
-{{define "header"}}
-package {{Variable .Variables "apiPackage"}};
-
-import {{Variable .Variables "clientPackage"}}.ApiClient;
-import java.io.Serializable
-import com.google.gson.reflect.TypeToken
-
+{{range $val :=.Output.Header}}
+{{- $val}}
 {{end}}
-
-
-
-
-
-{{define "struct"}}
-/**
- * {{.Description}}
- */
-data class {{.Type.Expression}} (
-	{{range $val :=.Properties -}}
-	//{{$val.Description}}
-	{{- if $val.Enums -}}// Enums: {{$val.Enums}} {{- end}}
-	var {{$val.Name}}: {{$val.Type.Expression}},
-	{{end}}
-) : Serializable
-{{end}}
-
-
-
-
-
-{{define "path"}}
-
-
-    var {{.Name}}ResultType = object : TypeToken<{{.Response.Expression}}>() {}.type
-	/**
-	 * {{.Description}}
-	 * {{.Summary}}
-	 */
-    suspend fun {{.Name}}({{template "parameters" .}}):  Result<{{.Response.Expression}}> {
-        {{- if .Queries}}
-        val params = HashMap<String,Any>()
-        {{range $idx,$val := .Parameters -}}
-        params["{{$val.Name}}"] = {{$val.Alias}}
-        {{end}}
-        {{- else -}}
-        {{if .Request}}{{else}}val params = HashMap<String,Any>(){{end}}
-        {{- end}}
-        return client.{{.Method}}({{.Path}},{{.Name}}ResultType, {{- if .Request}}body{{else}}params{{end}})
-    }
-{{end}}
-
-
-{{define "parameters"}}
-{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}}: {{$val.Type.Expression}}{{- end -}}
-{{end}}
-
-
-
-
-{{define "api"}}
-/**
- * {{.Description}}
- */
-class {{.Name}}(private var client: ApiClient) {
-	{{range $val :=.Paths -}}
-	{{template "path" $val}}
-	{{end}}
-}
-{{end}}
-
-
-{{define "client"}}
-
-package {{Variable .Variables "clientPackage"}};
 
 import com.google.gson.Gson
 import okhttp3.MediaType
@@ -141,5 +70,3 @@ interface RetrofitClient {
     @DELETE
     suspend fun delete(@Url path: String, @Body params: RequestBody?): Response<ResponseBody>
 }
-
-{{end}}

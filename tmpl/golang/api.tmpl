@@ -1,0 +1,42 @@
+{{range $val :=.Output.Header}}
+{{- $val}}
+{{end}}
+
+import "fmt"
+
+{{range $val :=.Apis}}
+{{template "api" $val}}
+{{end}}
+
+
+{{define "path"}}
+
+// {{Capitalize .Tag}}{{Capitalize .Name}} {{.Path}}
+type {{Capitalize .Tag}}{{Capitalize .Name}} struct {
+    Client ApiClient[{{.Response.Expression}}]
+}
+
+// Call {{.Description}}
+func (receiver *{{Capitalize .Tag}}{{Capitalize .Name}}) Call({{template "parameters" .}}) ({{.Response.Expression}}, error) {
+    {{if .Queries}}
+    params := map[string]any{}
+    {{range $idx,$val := .Queries -}}
+    params["{{$val.Name}}"] = {{$val.Alias}}
+    {{end -}}
+    {{- else -}}
+    {{if .Request}}{{else}}params := map[string]any{}{{end}}
+    {{- end}}
+    return receiver.Client.{{Capitalize .Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}})
+}
+{{end}}
+
+
+{{define "parameters"}}
+{{- range $idx,$val := .Parameters -}}{{if gt $idx 0}},{{end}} {{$val.Alias}} {{$val.Type.Expression}}{{- end -}}
+{{end}}
+
+{{define "api"}}
+    	{{range $val :=.Paths -}}
+    	{{template "path" $val}}
+    	{{end}}
+{{end}}
