@@ -28,7 +28,7 @@ var startCmd = &cobra.Command{
 			Output: tmpl.NewOutputs(initArgs.Lang),
 			Alias: internal.Alias{
 				Properties: make(map[string]string),
-				Modes:      make(map[string]string),
+				Models:     make(map[string]string),
 				Types:      make(map[string]string),
 				Parameters: make(map[string]string),
 			},

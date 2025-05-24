@@ -33,7 +33,7 @@ type Env struct {
 
 type Alias struct {
 	Properties map[string]string `json:"properties"`
-	Modes      map[string]string `json:"modes"`
+	Models     map[string]string `json:"models"`
 	Types      map[string]string `json:"types"`
 	Parameters map[string]string `json:"parameters"`
 }
@@ -196,7 +196,7 @@ func (e *Executor) buildRefs(outRefs []*tmpl.Ref) ([]*tmpl.Ref, error) {
 		}
 
 		//别名
-		ref.Alias = cmp.Or(e.env.Alias.Modes[ref.Name], ref.Name)
+		ref.Alias = cmp.Or(e.env.Alias.Models[ref.Name], ref.Name)
 	}
 
 	//有顺序要求，重新排序

@@ -1,0 +1,391 @@
+[
+  {
+    "name": "ts",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "ts",
+    "version": "v3",
+    "output": {
+      "api": {
+        "file": "client-ts/src/api.ts"
+      },
+      "client": {
+        "file": "client-ts/src/client.ts"
+      },
+      "model": {
+        "file": "client-ts/src/model.ts"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "models": {},
+      "types": {
+        "JsonNode": "any"
+      },
+      "parameters": {}
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "swift",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "swift",
+    "version": "v3",
+    "output": {
+      "api": {
+        "file": "client-swift/api.swift"
+      },
+      "client": {
+        "file": "client-swift/client.swift"
+      },
+      "model": {
+        "file": "client-swift/model.swift"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "models": {},
+      "types": {
+        "JsonNode": "String"
+      },
+      "parameters": {}
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "python",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "python",
+    "version": "v3",
+    "output": {
+      "api": {
+        "file": "client-python/api.py"
+      },
+      "client": {
+        "file": "client-python/client.py"
+      },
+      "model": {
+        "file": "client-python/model.py"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "models": {},
+      "types": {
+        "JsonNode": "Any"
+      },
+      "parameters": {}
+    },
+    "variables": {},
+    "generics": {
+      "enable": false,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "kotlin",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "kotlin",
+    "version": "v3",
+    "output": {
+      "api": {
+        "header": [
+          "package com.demo;"
+        ],
+        "file": "client-kotlin/app/src/main/java/com/demo/Api.kt"
+      },
+      "client": {
+        "header": [
+          "package com.demo;"
+        ],
+        "file": "client-kotlin/app/src/main/java/com/demo/Client.kt"
+      },
+      "model": {
+        "header": [
+          "package com.demo;"
+        ],
+        "file": "client-kotlin/app/src/main/java/com/demo/Model.kt"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "models": {},
+      "types": {
+        "JsonNode": "Any"
+      },
+      "parameters": {}
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "java",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "java",
+    "version": "v3",
+    "output": {
+      "api": {
+        "header": [
+          "package demo.api;",
+          "",
+          "import demo.model.*;",
+          "import demo.ApiClient;"
+        ],
+        "file": "client-java/src/main/java/demo/api/{api}.java"
+      },
+      "client": {
+        "header": [
+          "package demo;"
+        ],
+        "file": "client-java/src/main/java/demo/ApiClient.java"
+      },
+      "model": {
+        "header": [
+          "package demo.model;"
+        ],
+        "file": "client-java/src/main/java/demo/model/{model}.java"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "models": {},
+      "types": {},
+      "parameters": {}
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "go",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "go",
+    "version": "v3",
+    "output": {
+      "api": {
+        "header": [
+          "package api;"
+        ],
+        "file": "client-go/api/api.go"
+      },
+      "client": {
+        "header": [
+          "package api;"
+        ],
+        "file": "client-go/api/client.go"
+      },
+      "model": {
+        "header": [
+          "package api;"
+        ],
+        "file": "client-go/api/model.go"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "models": {},
+      "types": {
+        "JsonNode": "any"
+      },
+      "parameters": {
+        "type": "kind"
+      }
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "cs",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "cs",
+    "version": "v3",
+    "output": {
+      "api": {
+        "header": [
+          "namespace demo;"
+        ],
+        "file": "client-cs/Api.cs"
+      },
+      "client": {
+        "header": [
+          "namespace demo;"
+        ],
+        "file": "client-cs/Client.cs"
+      },
+      "model": {
+        "header": [
+          "namespace demo;"
+        ],
+        "file": "client-cs/Model.cs"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {},
+      "models": {},
+      "types": {
+      },
+      "parameters": {
+      }
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "rust",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "rust",
+    "version": "v3",
+    "output": {
+      "api": {
+        "file": "client-rs/src/api.rs"
+      },
+      "client": {
+        "file": "client-rs/src/client.rs"
+      },
+      "model": {
+        "file": "client-rs/src/model.rs"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {
+        "type": "kind"
+      },
+      "models": {},
+      "types": {
+        "JsonNode": "String"
+      },
+      "parameters": {
+        "type": "kind"
+      }
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  },
+  {
+    "name": "dart",
+    "endpoint": "http://localhost:8080/v3/api-docs/api",
+    "lang": "dart",
+    "version": "v3",
+    "output": {
+      "api": {
+        "file": "client-dart/src/api.dart"
+      },
+      "client": {
+        "file": "client-dart/src/client.dart"
+      },
+      "model": {
+        "file": "client-dart/src/model.dart"
+      }
+    },
+    "ignore": [],
+    "filter": [],
+    "alias": {
+      "properties": {
+        "type": "kind"
+      },
+      "models": {},
+      "types": {
+        "JsonNode": "String"
+      },
+      "parameters": {
+        "type": "kind"
+      }
+    },
+    "variables": {},
+    "generics": {
+      "enable": true,
+      "unfold": false,
+      "expressions": {
+        "ApiResult": [
+          "data"
+        ]
+      }
+    },
+    "repeatable_operation_id": false
+  }
+]

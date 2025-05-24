@@ -38,7 +38,7 @@ var initCmd = &cobra.Command{
 			Filter: []string{},
 			Alias: internal.Alias{
 				Properties: make(map[string]string),
-				Modes:      make(map[string]string),
+				Models:     make(map[string]string),
 				Types:      make(map[string]string),
 				Parameters: make(map[string]string),
 			},
