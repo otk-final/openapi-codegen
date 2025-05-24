@@ -1,0 +1,12 @@
+
+
+use std::any::Any;
+use std::collections::HashMap;
+use std::io::Error;
+
+pub trait ApiClient {
+    fn get<T>(&self, path: String, params: HashMap<String, dyn Any>) -> Result<T, Error>;
+    fn post<T, P>(&self, path: String, params: P) -> Result<T, Error>;
+    fn put<T, P>(&self, path: String, params: P) -> Result<T, Error>;
+    fn delete<T, P>(&self, path: String, params: P) -> Result<T, Error>;
+}
