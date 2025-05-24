@@ -2,7 +2,6 @@ package tmpl
 
 import (
 	"codegen/tmpl/cs"
-	"codegen/tmpl/dart"
 	"codegen/tmpl/golang"
 	"codegen/tmpl/java"
 	"codegen/tmpl/kotlin"
@@ -28,7 +27,6 @@ var register = map[string]map[string]string{
 	"java":   java.Templates,
 	"cs":     cs.Templates,   //TODO
 	"rust":   rust.Templates, //TODO
-	"dart":   dart.Templates, //TODO
 }
 
 func Capitalize(s string) string {

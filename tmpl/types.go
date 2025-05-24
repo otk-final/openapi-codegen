@@ -3,7 +3,6 @@ package tmpl
 import (
 	"codegen/lang"
 	"codegen/tmpl/cs"
-	"codegen/tmpl/dart"
 	"codegen/tmpl/golang"
 	"codegen/tmpl/java"
 	"codegen/tmpl/kotlin"
@@ -25,7 +24,6 @@ func init() {
 	handlers["kotlin"] = &kotlin.Convert{}
 	handlers["python"] = &python.Convert{}
 	handlers["cs"] = &cs.Convert{}
-	handlers["dart"] = &dart.Convert{}
 	handlers["rust"] = &rust.Convert{}
 }
 
