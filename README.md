@@ -4,7 +4,7 @@ This is a tool that generates API call code in various programming languages bas
 
 根据openapi (swagger) 文档生成不同编程语言客户端接口代码
 
-| Language   | 参考                                                                                        |
+| Language   | Demo                                                                                      |
 |------------|-------------------------------------------------------------------------------------------|
 | Java       | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_java.jpg)   |
 | Typescript | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_ts.jpg)     |
@@ -13,7 +13,7 @@ This is a tool that generates API call code in various programming languages bas
 | Python     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_python.jpg) |
 | Kotlin     | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_kotlin.jpg) |
 | C#         | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_cs.jpg)     |
-| Rust       | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_rs.jpg)     |
+| Rust       | ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/api_rust.jpg)   |
 
 ![image](https://github.com/otk-final/openapi-codegen/blob/master/_images/home_api.png)
 
