@@ -35,16 +35,9 @@ type stdWriter struct {
 func (w *stdWriter) write(output *tmpl.Output, apis []*tmpl.Api, models []*tmpl.Ref, engine *template.Template) error {
 	buf := &bytes.Buffer{}
 
-	if w.name == "model" {
-
-		models = lo.Filter(models, func(item *tmpl.Ref, index int) bool {
-			return !item.Ignore
-		})
-
-		if len(models) == 0 {
-			return nil
-		}
-	}
+	models = lo.Filter(models, func(item *tmpl.Ref, index int) bool {
+		return !item.Ignore
+	})
 
 	data := struct {
 		Output *tmpl.Output
