@@ -103,6 +103,10 @@ func (e *Executor) Run(cmd *Args) error {
 			output.Variables[k] = v
 		}
 
+		if output.Ignore {
+			continue
+		}
+
 		writer := newWriter(name, e.env)
 		engine, err := tmpl.NewEngine(e.env.Lang, name, output.Template, output.Variables)
 		if err != nil {
