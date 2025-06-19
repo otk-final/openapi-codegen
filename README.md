@@ -135,7 +135,9 @@ openapi reload -f /app/openapi.json -n ts
       },
       // api 模版
       "client": {
-        "file": "src/main/java/demo/ApiClient.java"
+        "file": "src/main/java/demo/ApiClient.java",
+        // 自定义修改后，设置忽略，防止下次重新生成被覆盖
+        "ignore":true
       },
       "model": {
         "file": "src/main/java/demo/model/{model}.java"
