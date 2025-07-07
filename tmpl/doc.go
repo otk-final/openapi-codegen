@@ -58,6 +58,8 @@ const (
 	ReferenceType
 
 	GenericType
+
+	RenameType
 )
 
 type NamedType struct {

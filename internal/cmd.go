@@ -187,6 +187,23 @@ func (e *Executor) buildRefs(outRefs []*tmpl.Ref) ([]*tmpl.Ref, error) {
 				property.Type.GenerateExpression(property.Format, typeConvert)
 			}
 
+			//强制指定属性类型
+			rename, ok := e.env.Alias.Types["~"+property.Name]
+			if ok {
+				property.Type = &tmpl.NamedType{
+					Kind:       tmpl.RenameType,
+					Expression: rename,
+				}
+			}
+
+			rename, ok = e.env.Alias.Types[ref.Name+":"+property.Name]
+			if ok {
+				property.Type = &tmpl.NamedType{
+					Kind:       tmpl.RenameType,
+					Expression: rename,
+				}
+			}
+
 			property.Alias = cmp.Or(e.env.Alias.Properties[property.Name], property.Name)
 		}
 

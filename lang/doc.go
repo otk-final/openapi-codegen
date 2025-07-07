@@ -45,7 +45,7 @@ func Format(lang string, path string, alias map[string]string) string {
 
 		switch lang {
 		case "ts":
-			return fmt.Sprintf("${%s}", segment)
+			return fmt.Sprintf("${params?.%s}", segment)
 		case "go":
 			return "%v"
 		case "swift":
