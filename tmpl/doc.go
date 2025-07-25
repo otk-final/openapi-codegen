@@ -2,7 +2,9 @@ package tmpl
 
 import (
 	"codegen/lang"
+	"fmt"
 	"github.com/samber/lo"
+	"strings"
 )
 
 type Api struct {
@@ -72,6 +74,32 @@ type NamedType struct {
 var VoidNamedType = &NamedType{Kind: VoidType, Expression: ""}
 
 type Parameters = []*Parameter
+
+func (nt *NamedType) RenameExpression(scope string, name string, types map[string]string, convert lang.TypeConvert) {
+
+	matches := []string{
+		name,                              //全匹配
+		fmt.Sprintf("%s:%s", scope, name), //配合属性对象，或者方法名
+	}
+
+	for k, v := range types {
+
+		//~Id xxxId
+		//Id~ Idxxx
+		//~Id orderId
+		matchPrefix := strings.HasPrefix(k, "~") && strings.HasSuffix(name, strings.TrimPrefix(k, "~"))
+		matchSuffix := strings.HasSuffix(k, "~") && strings.HasPrefix(name, strings.TrimSuffix(k, "~"))
+
+		//前后缀匹配
+		if matchPrefix || matchSuffix || lo.Contains(matches, k) {
+
+			nt.Kind = RenameType
+			nt.Expression = v
+
+			return
+		}
+	}
+}
 
 func (nt *NamedType) GenerateExpression(format string, convert lang.TypeConvert) {
 	expression := nt.Expression

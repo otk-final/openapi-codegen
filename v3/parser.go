@@ -8,25 +8,33 @@ import (
 	"github.com/samber/lo"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 )
 
 func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 
-	resp, err := http.Get(addr)
-	if err != nil {
-		return nil, nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, nil, fmt.Errorf("%s %s", addr, http.StatusText(resp.StatusCode))
+	var body []byte
+	if strings.HasPrefix("http", addr) {
+		resp, err := http.Get(addr)
+		if err != nil {
+			return nil, nil, err
+		}
+		if resp.StatusCode != http.StatusOK {
+			return nil, nil, fmt.Errorf("%s %s", http.StatusText(resp.StatusCode), addr)
+		}
+
+		defer func() {
+			_ = resp.Body.Close()
+		}()
+		body, _ = io.ReadAll(resp.Body)
+	} else {
+		//文件读取
+		body, _ = os.ReadFile(addr)
 	}
 
-	defer func() {
-		_ = resp.Body.Close()
-	}()
-
-	body, _ := io.ReadAll(resp.Body)
 	var doc = &Doc{}
-	err = json.Unmarshal(body, doc)
+	err := json.Unmarshal(body, doc)
 	if err != nil {
 		return nil, nil, err
 	}

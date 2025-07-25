@@ -184,26 +184,15 @@ func (e *Executor) buildRefs(outRefs []*tmpl.Ref) ([]*tmpl.Ref, error) {
 		for _, property := range properties {
 
 			if property.Type != nil {
+
+				//生成类型表达式
 				property.Type.GenerateExpression(property.Format, typeConvert)
+
+				//重命名表达式
+				property.Type.RenameExpression(ref.Name, property.Name, e.env.Alias.Types, typeConvert)
 			}
 
-			//强制指定属性类型
-			rename, ok := e.env.Alias.Types["~"+property.Name]
-			if ok {
-				property.Type = &tmpl.NamedType{
-					Kind:       tmpl.RenameType,
-					Expression: rename,
-				}
-			}
-
-			rename, ok = e.env.Alias.Types[ref.Name+":"+property.Name]
-			if ok {
-				property.Type = &tmpl.NamedType{
-					Kind:       tmpl.RenameType,
-					Expression: rename,
-				}
-			}
-
+			//如遇关键词冲突，重命名属性名
 			property.Alias = cmp.Or(e.env.Alias.Properties[property.Name], property.Name)
 		}
 
@@ -306,8 +295,15 @@ func (e *Executor) buildApis(outRefs []*tmpl.Ref, outApis []*tmpl.Api) ([]*tmpl.
 
 			//参数转换
 			for _, parameter := range path.Parameters {
-				parameter.Type.GenerateExpression(parameter.Format, typeConvert)
-				//别名
+
+				if parameter.Type != nil {
+					//生成表达式
+					parameter.Type.GenerateExpression(parameter.Format, typeConvert)
+					//重命名表达式
+					parameter.Type.RenameExpression(path.Name, parameter.Name, e.env.Alias.Types, typeConvert)
+				}
+
+				//如遇关键词，重命名
 				parameter.Alias = cmp.Or(e.env.Alias.Parameters[parameter.Name], parameter.Name)
 			}
 
