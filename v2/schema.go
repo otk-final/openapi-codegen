@@ -24,8 +24,8 @@ type Method struct {
 }
 
 type Response struct {
-	Description string `json:"description,omitempty"`
-	Schema      Schema `json:"schema,omitempty"`
+	Description string  `json:"description,omitempty"`
+	Schema      *Schema `json:"schema,omitempty"`
 }
 
 type Schema struct {

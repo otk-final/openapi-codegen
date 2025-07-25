@@ -90,7 +90,7 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		return parameters
 	}
 
-	toRequest := func(method string, info Method) (nt *tmpl.NamedType) {
+	toRequest := func(path string, method string, info Method) (nt *tmpl.NamedType) {
 
 		req, ok := lo.Find(info.Parameters, func(item Parameter) bool {
 			return item.In == "body"
@@ -103,9 +103,13 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		return schemaType(req.Schema).Parse()
 	}
 
-	toResponse := func(method string, info Method) *tmpl.NamedType {
+	toResponse := func(path string, method string, info Method) *tmpl.NamedType {
 		response := info.Responses["200"]
-		return schemaType(response.Schema).Parse()
+		if response.Schema == nil {
+			fmt.Printf("Waning: undefine response structur [%s %s]\n", method, path)
+			return tmpl.VoidNamedType
+		}
+		return schemaType(*response.Schema).Parse()
 	}
 
 	paths := make([]*tmpl.Path, 0)
@@ -121,8 +125,8 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 				OriginalPath: path,
 				Method:       method,
 				Parameters:   toParameters(method, fn),
-				Request:      toRequest(method, fn),
-				Response:     toResponse(method, fn),
+				Request:      toRequest(path, method, fn),
+				Response:     toResponse(path, method, fn),
 			}
 			paths = append(paths, p)
 		}

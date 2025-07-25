@@ -60,12 +60,16 @@ const (
 	GenericType
 
 	RenameType
+
+	VoidType
 )
 
 type NamedType struct {
 	Kind       NamedTypeKind
 	Expression string
 }
+
+var VoidNamedType = &NamedType{Kind: VoidType, Expression: ""}
 
 type Parameters = []*Parameter
 
@@ -80,7 +84,7 @@ func (nt *NamedType) GenerateExpression(format string, convert lang.TypeConvert)
 
 func (nk NamedTypeKind) Parse(expression string, format string, convert lang.TypeConvert) string {
 
-	if nk&FoundationType != 0 {
+	if nk&FoundationType != 0 || nk&VoidType != 0 {
 		expression = convert.Foundation(expression, format)
 	}
 	if nk&ReferenceType != 0 {
@@ -92,6 +96,7 @@ func (nk NamedTypeKind) Parse(expression string, format string, convert lang.Typ
 	if nk&MapType != 0 {
 		expression = convert.Map(expression)
 	}
+
 	return expression
 }
 

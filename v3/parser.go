@@ -87,15 +87,23 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 		return parameters
 	}
 
-	toRequest := func(method string, info Method) (nt *tmpl.NamedType) {
+	toRequest := func(path string, method string, info Method) (nt *tmpl.NamedType) {
 
 		schema := info.RequestBody.Content["application/json"].Schema
 		return schemaType(schema).Parse()
 	}
 
-	toResponse := func(method string, info Method) *tmpl.NamedType {
+	toResponse := func(path string, method string, info Method) *tmpl.NamedType {
 		response := info.Responses["200"]
-		return schemaType(response.Content["*/*"].Schema).Parse()
+
+		//未声明响应
+		content := response.Content
+		if len(content) == 0 {
+			fmt.Printf("Waning: undefine response structur [%s %s]\n", method, path)
+			return tmpl.VoidNamedType
+		}
+
+		return schemaType(content["*/*"].Schema).Parse()
 	}
 
 	paths := make([]*tmpl.Path, 0)
@@ -111,8 +119,8 @@ func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 				OriginalPath: path,
 				Method:       method,
 				Parameters:   toParameters(method, fn),
-				Request:      toRequest(method, fn),
-				Response:     toResponse(method, fn),
+				Request:      toRequest(path, method, fn),
+				Response:     toResponse(path, method, fn),
 			}
 			paths = append(paths, p)
 		}
