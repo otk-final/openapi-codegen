@@ -14,7 +14,7 @@ import (
 func LoadParse(addr string) ([]*tmpl.Ref, []*tmpl.Api, error) {
 
 	var body []byte
-	if strings.HasPrefix("http", addr) {
+	if strings.HasPrefix(addr, "http") {
 		resp, err := http.Get(addr)
 		if err != nil {
 			return nil, nil, err
