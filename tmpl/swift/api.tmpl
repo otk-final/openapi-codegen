@@ -22,10 +22,12 @@
         {{range $idx,$val := .Queries -}}
         params["{{$val.Name}}"] = {{$val.Alias}}
         {{end -}}
+
         {{- else -}}
-        {{if .Request}}{{else}}let params: [String: String] = [:]{{end}}
+        {{if .Request}}{{else}}let params: [String: Any] = [:]{{end}}
         {{- end}}
-        return try await client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}params{{end}} ,{{.Response.Expression}}.self)
+
+        return try await client.{{.Method}}({{.Path}}, {{- if .Request}}body{{else}}{{if eq .Method "get"}}params{{else}}AnyCodable(params){{end}}{{end}} ,{{.Response.Expression}}.self)
     }
 {{end}}
 

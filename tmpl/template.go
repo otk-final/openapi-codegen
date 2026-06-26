@@ -51,7 +51,11 @@ func NewEngine(lang string, name string, style string, variable map[string]strin
 
 	//自定义模版
 	if style != "" {
-		return tp.ParseFiles(PwdJoinPath(style))
+		data, err := os.ReadFile(PwdJoinPath(style))
+		if err != nil {
+			return nil, err
+		}
+		return tp.Parse(string(data))
 	}
 
 	mapping, ok := register[lang]
