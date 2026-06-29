@@ -11,7 +11,7 @@ import Foundation
 /**
  * TODO You need to implement the current protocol, which can refer to Alamofire or URLSession
  */
-protocol ApiClient {
+protocol HttpClient {
     func get<T: Codable>(_ path: String, _ params: [String: Any], _ resultType: T.Type) async throws -> T
 
     func post<T: Codable>(_ path: String, _ params: Codable, _ resultType: T.Type) async throws -> T
@@ -50,7 +50,7 @@ class AlamofireLogger: EventMonitor {
 
 var headers: HTTPHeaders? = []
 
-struct AlamofireClient: ApiClient {
+struct ApiClient: HttpClient {
 
     var BASE_URL = "{{.Env.Endpoint}}"
 
